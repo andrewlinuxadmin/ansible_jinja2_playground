@@ -1,0 +1,280 @@
+Test Execution Report - 2025-08-08T12:10:55.670186
+======================================================================
+
+📦 Module: test_main_page
+----------------------------------------
+Tests run: 3
+Passed: 3
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_get_main_page_contains_required_elements (test_main_page.TestMainPageEndpoint)
+Test that main page contains required HTML elements ... ok
+test_get_main_page_encoding (test_main_page.TestMainPageEndpoint)
+Test that main page is properly UTF-8 encoded ... ok
+test_get_main_page_returns_html (test_main_page.TestMainPageEndpoint)
+Test that GET / returns HTML page ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.605s
+
+OK
+
+
+📦 Module: test_history
+----------------------------------------
+Tests run: 7
+Passed: 7
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_get_history_decodes_base64 (test_history.TestHistoryEndpoints)
+Test that GET /history properly decodes base64 encoded data ... ok
+test_get_history_empty (test_history.TestHistoryEndpoints)
+Test GET /history when history is empty ... ok
+test_get_history_handles_corrupted_base64 (test_history.TestHistoryEndpoints)
+Test GET /history handles corrupted base64 data gracefully ... ok
+test_get_history_maxsize (test_history.TestHistoryEndpoints)
+Test GET /history/maxsize returns correct max size ... ok
+test_get_history_size_empty (test_history.TestHistoryEndpoints)
+Test GET /history/size when history is empty ... ok
+test_get_history_size_with_data (test_history.TestHistoryEndpoints)
+Test GET /history/size with existing history data ... ok
+test_get_history_with_data (test_history.TestHistoryEndpoints)
+Test GET /history with existing history data ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.605s
+
+OK
+
+
+📦 Module: test_history_clear
+----------------------------------------
+Tests run: 10
+Passed: 10
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_post_history_clear_all (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear without count parameter clears all history ... ok
+test_post_history_clear_count_larger_than_history (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear with count larger than history size ... ok
+test_post_history_clear_count_zero (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear with count=0 ... ok
+test_post_history_clear_creates_directory (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear creates directory if it doesn't exist ... ok
+test_post_history_clear_empty_history (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear when history is already empty ... ok
+test_post_history_clear_invalid_count (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear with invalid count parameter ... ok
+test_post_history_clear_negative_count (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear with negative count ... ok
+test_post_history_clear_preserves_format (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear preserves JSON format in history file ... ok
+test_post_history_clear_with_count (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear with count parameter ... ok
+test_post_history_clear_with_multiple_count_params (test_history_clear.TestHistoryClearEndpoint)
+Test POST /history/clear with multiple count parameters ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.609s
+
+OK
+
+
+📦 Module: test_settings_get
+----------------------------------------
+Tests run: 9
+Passed: 9
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_get_all_settings (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings without section parameter returns all sections ... ok
+test_get_history_section (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings?section=history ... ok
+test_get_input_files_section (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings?section=input_files ... ok
+test_get_nonexistent_section (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings?section=nonexistent returns empty dict ... ok
+test_get_settings_preserves_data_types (test_settings_get.TestSettingsGetEndpoint)
+Test that GET /settings preserves proper data types from config ... ok
+test_get_settings_with_encoded_section_name (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings with URL-encoded section name ... ok
+test_get_settings_with_multiple_section_params (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings with multiple section parameters (should use first) ... ok
+test_get_specific_section (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings?section=<name> returns specific section ... ok
+test_get_user_section (test_settings_get.TestSettingsGetEndpoint)
+Test GET /settings?section=user ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.606s
+
+OK
+
+
+📦 Module: test_settings_post
+----------------------------------------
+Tests run: 12
+Passed: 12
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_post_settings_create_new_section (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings creates new section ... ok
+test_post_settings_creates_conf_directory (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings creates conf directory if missing ... ok
+test_post_settings_handles_special_characters (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings handles special characters in values ... ok
+test_post_settings_ignores_section_in_values (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings ignores 'section' key in other parameters ... ok
+test_post_settings_input_directory_security_validation (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings validates input directory for security ... ok
+test_post_settings_input_directory_valid_path (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings accepts valid input directory ... ok
+test_post_settings_missing_section (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings without section parameter ... ok
+test_post_settings_multiple_keys_same_section (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings updates multiple keys in same section ... ok
+test_post_settings_preserves_other_sections (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings doesn't affect other sections ... ok
+test_post_settings_server_section (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings updates server section ... ok
+test_post_settings_update_existing_section (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings updates existing section ... ok
+test_post_settings_update_history_max_entries (test_settings_post.TestSettingsPostEndpoint)
+Test POST /settings updates history max_entries and global variable ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.610s
+
+OK
+
+
+📦 Module: test_input_files
+----------------------------------------
+Tests run: 11
+Passed: 11
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_get_input_file_content_empty_file (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content for empty file ... ok
+test_get_input_file_content_json (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content for JSON file ... ok
+test_get_input_file_content_missing_filename (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content without filename parameter ... ok
+test_get_input_file_content_nonexistent_file (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content for file that doesn't exist ... ok
+test_get_input_file_content_path_traversal_attack (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content prevents path traversal attacks ... ok
+test_get_input_file_content_with_special_characters (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content with URL-encoded special characters ... ok
+test_get_input_file_content_yaml (test_input_files.TestInputFilesEndpoints)
+Test GET /input-file-content for YAML file ... ok
+test_get_input_files_empty_directory (test_input_files.TestInputFilesEndpoints)
+Test GET /input-files when input directory is empty ... ok
+test_get_input_files_excludes_directories (test_input_files.TestInputFilesEndpoints)
+Test GET /input-files excludes subdirectories ... ok
+test_get_input_files_list (test_input_files.TestInputFilesEndpoints)
+Test GET /input-files returns list of available files ... ok
+test_get_input_files_nonexistent_directory (test_input_files.TestInputFilesEndpoints)
+Test GET /input-files when input directory doesn't exist ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.609s
+
+OK
+
+
+📦 Module: test_render
+----------------------------------------
+Tests run: 17
+Passed: 17
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_post_render_ansible_filters (test_render.TestRenderEndpoint)
+Test POST /render with Ansible filters ... ok
+test_post_render_complex_nested_data (test_render.TestRenderEndpoint)
+Test POST /render with complex nested data structures ... ok
+test_post_render_doesnt_save_empty_input_to_history (test_render.TestRenderEndpoint)
+Test POST /render doesn't save empty input to history ... ok
+test_post_render_empty_input (test_render.TestRenderEndpoint)
+Test POST /render with empty input ... ok
+test_post_render_invalid_jinja_syntax (test_render.TestRenderEndpoint)
+Test POST /render with invalid Jinja2 syntax ... ok
+test_post_render_invalid_json (test_render.TestRenderEndpoint)
+Test POST /render with invalid JSON input ... ok
+test_post_render_invalid_yaml (test_render.TestRenderEndpoint)
+Test POST /render with invalid YAML input ... ok
+test_post_render_json_output (test_render.TestRenderEndpoint)
+Test POST /render that produces JSON output ... ok
+test_post_render_loop_invalid_variable (test_render.TestRenderEndpoint)
+Test POST /render with loop and invalid loop variable ... ok
+test_post_render_loop_non_array_variable (test_render.TestRenderEndpoint)
+Test POST /render with loop variable that's not an array ... ok
+test_post_render_loop_with_data_prefix (test_render.TestRenderEndpoint)
+Test POST /render with loop using 'data.' prefix ... ok
+test_post_render_saves_to_history (test_render.TestRenderEndpoint)
+Test POST /render saves entries to history ... ok
+test_post_render_simple_json (test_render.TestRenderEndpoint)
+Test POST /render with simple JSON input ... ok
+test_post_render_undefined_variable (test_render.TestRenderEndpoint)
+Test POST /render with undefined variable ... ok
+test_post_render_unicode_characters (test_render.TestRenderEndpoint)
+Test POST /render with Unicode characters ... ok
+test_post_render_with_loop_enabled (test_render.TestRenderEndpoint)
+Test POST /render with loop functionality ... ok
+test_post_render_yaml_input (test_render.TestRenderEndpoint)
+Test POST /render with YAML input ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.619s
+
+OK
+
+
+📦 Module: test_404
+----------------------------------------
+Tests run: 5
+Passed: 5
+Failed: 0
+Errors: 0
+
+Detailed output:
+test_get_invalid_endpoint (test_404.Test404Endpoint)
+Test GET request to invalid endpoint returns 404 ... ok
+test_get_nonexistent_nested_path (test_404.Test404Endpoint)
+Test GET request to non-existent nested path ... ok
+test_get_root_with_trailing_slash (test_404.Test404Endpoint)
+Test GET request to root with trailing slash ... ok
+test_post_invalid_endpoint (test_404.Test404Endpoint)
+Test POST request to invalid endpoint returns 404 ... ok
+test_put_method_not_allowed (test_404.Test404Endpoint)
+Test PUT method (not implemented) to valid endpoint ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.103s
+
+OK
+
+
+======================================================================
+FINAL SUMMARY
+======================================================================
+Total tests: 74
+Passed: 74
+Failed: 0
+Errors: 0
+Duration: 4.57 seconds
+Success rate: 100.0%

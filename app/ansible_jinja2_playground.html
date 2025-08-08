@@ -1,0 +1,616 @@
+<!--
+  Ansible Jinja2 Playground - Frontend
+
+  COPILOT GUIDELINES:
+  - Use regular functions instead of arrow functions for Firefox compatibility
+  - Always test auto-load functionality with environment virtual activated
+  - Maintain reverse chronological order in history
+  - Use boolean values for enable_loop (no base64)
+  - Keep jQuery patterns consistent
+  - Add meaningful variable names in Portuguese or English
+-->
+<html>
+<head>
+  <title>Ansible Jinja2 Playground</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- CodeMirror CSS & Themes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Popper and Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  <!-- CodeMirror JS and modes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/jinja2/jinja2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/yaml/yaml.min.js"></script>
+  <style>
+    /* Dark mode styles */
+    body.dark-mode { background-color: #1e1e1e; color: #ccc; }
+    .card.dark-mode { background-color: #2e2e2e; color: #ddd; }
+    body.dark-mode .bg-light { background-color: #444 !important; color: #eee !important; }
+    body.dark-mode .form-control, body.dark-mode .form-select { background-color: #333; color: #eee; border-color: #555; }
+    body.dark-mode .btn { background-color: #555; color: #eee; border-color: #666; }
+    body.dark-mode .modal-content { background-color: #2e2e2e; color: #ddd; }
+    body.dark-mode .modal-header, body.dark-mode .modal-footer { border-color: #555; }
+    body.dark-mode .btn-close { filter: invert(1); }
+    /* CodeMirror styling with vertical resize */
+    .CodeMirror {
+      border: 1px solid #ccc;
+      font-family: monospace;
+      font-size: 14px;
+      resize: vertical !important;
+      overflow: auto;
+    }
+    body.dark-mode .CodeMirror { border: 1px solid #555; }
+    .note { font-style: italic; color: #555; }
+    body.dark-mode .note { color: #aaa; }
+    #top-controls { position: absolute; top: 20px; right: 20px; z-index: 1050; }
+
+    /* Loop controls styling */
+    .loop-controls-label {
+      color: #495057 !important;
+    }
+    body.dark-mode .loop-controls-label {
+      color: #e9ecef !important;
+    }
+
+    /* Gap between elements in flex */
+    .gap-3 {
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="top-controls">
+    <button id="clear-all" class="btn btn-warning me-2">Clear All</button>
+    <button id="settings-toggle" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#settingsModal">Settings</button>
+  </div>
+
+  <div class="container-fluid my-4">
+    <h1 class="text-center mb-4">Ansible Jinja2 Playground <small class="text-muted" id="version">v1.2</small></h1>
+    <div class="mb-3 mx-auto" style="width:90%;" id="input-files-container" style="display:none;">
+      <label for="input-files-select" class="form-label">Load from Input Files</label>
+      <select id="input-files-select" class="form-select">
+        <option value="">-- Select input file --</option>
+      </select>
+    </div>
+    <div class="mb-3 mx-auto" style="width:90%;">
+      <label for="history-select" class="form-label">Load from History</label>
+      <select id="history-select" class="form-select">
+        <option value="">-- Select past entry --</option>
+      </select>
+    </div>
+
+    <!-- JSON/YAML Input -->
+    <div class="card mb-4 mx-auto" style="width:90%;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h2 class="card-title bg-light p-2 mb-0">JSON/YAML Input</h2>
+          <button class="btn btn-sm btn-outline-secondary" onclick="downloadInputContent()">
+            <i class="fas fa-download"></i> Download
+          </button>
+        </div>
+        <form id="upload-form" class="mb-3">
+          <div class="input-group">
+            <input type="file" class="form-control" id="jsonfile" name="jsonfile">
+            <button type="submit" class="btn btn-primary">Load File</button>
+          </div>
+        </form>
+        <div class="mb-2">
+          <select id="input-mode" class="form-select w-auto">
+            <option value="application/json">JSON</option>
+            <option value="text/x-yaml">YAML</option>
+          </select>
+        </div>
+        <textarea id="inputcode"></textarea>
+      </div>
+    </div>
+
+    <!-- Jinja2 Expression -->
+    <div class="card mb-4 mx-auto" style="width:90%;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="card-title bg-light p-2 mb-0">Jinja2 Expression</h2>
+          <div class="d-flex align-items-center gap-3">
+            <!-- Loop Controls -->
+            <div class="form-check d-flex align-items-center mb-0">
+              <input class="form-check-input me-2" type="checkbox" id="enable-loop" onchange="toggleLoopControls()">
+              <label class="form-check-label small fw-bold loop-controls-label" for="enable-loop">
+                Ansible Loop
+              </label>
+            </div>
+            <div class="d-none" id="loop-variable-container">
+              <input type="text" class="form-control form-control-sm" id="loop-variable"
+                     placeholder="servers, data.items..."
+                     style="width: 160px;"
+                     title="Path to the array variable in your input data">
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="downloadExpressionContent()">
+              <i class="fas fa-download"></i> Download
+            </button>
+          </div>
+        </div>
+
+        <textarea id="jinjacodetemplate"></textarea>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="card mb-4 mx-auto" style="width:90%;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h2 class="card-title bg-light p-2 mb-0">Result <small id="result-type" class="text-muted"></small></h2>
+          <button class="btn btn-sm btn-outline-secondary" onclick="downloadResultContent()">
+            <i class="fas fa-download"></i> Download
+          </button>
+        </div>
+        <div class="mb-2">
+          <select id="result-mode" class="form-select w-auto">
+            <option value="application/json">JSON</option>
+            <option value="text/plain">Plain text</option>
+            <option value="text/x-yaml">YAML</option>
+            <option value="application/xml">XML</option>
+          </select>
+        </div>
+        <textarea id="resultview" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="theme-select" class="form-label">Editor Theme</label>
+            <select id="theme-select" class="form-select">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="input-files-directory" class="form-label">Input Files Directory</label>
+            <input type="text" class="form-control" id="input-files-directory" placeholder="Path to directory with input files">
+            <div class="form-text">Leave empty to disable. Can be relative or absolute path.</div>
+          </div>
+          <div class="mb-3">
+            <label for="input-files-refresh" class="form-label">Input Files Refresh Interval (seconds)</label>
+            <input type="number" class="form-control" id="input-files-refresh" min="1" value="1">
+          </div>
+          <div class="mb-3">
+            <label for="height-inputcode" class="form-label">JSON Editor Height (px)</label>
+            <input type="number" class="form-control" id="height-inputcode">
+          </div>
+          <div class="mb-3">
+            <label for="height-jinjaexpr" class="form-label">Jinja Expression Editor Height (px)</label>
+            <input type="number" class="form-control" id="height-jinjaexpr">
+          </div>
+          <div class="mb-3">
+            <label for="height-resultview" class="form-label">Result Editor Height (px)</label>
+            <input type="number" class="form-control" id="height-resultview">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="reset-heights" class="btn btn-warning">Reset Heights</button>
+          <button type="button" id="save-settings" class="btn btn-primary">Save Settings</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let historyMap = [], inputEditor, jinjaEditor, resultEditor;
+    let inputFilesRefreshInterval = null;
+    let historyRefreshInterval = null;
+    const themes = {
+      light: 'eclipse', dark: 'dracula'
+    };
+    let currentTheme;
+
+    // Function to toggle loop controls
+    function toggleLoopControls(autoRender = true) {
+      const enableLoop = document.getElementById('enable-loop').checked;
+      const loopVariableContainer = document.getElementById('loop-variable-container');
+      const loopVariable = document.getElementById('loop-variable');
+
+      if (enableLoop) {
+        loopVariableContainer.classList.remove('d-none');
+        loopVariable.disabled = false;
+      } else {
+        loopVariableContainer.classList.add('d-none');
+        loopVariable.disabled = true;
+        loopVariable.value = '';
+      }
+
+      // Auto-render when loop state changes (unless disabled)
+      if (autoRender) {
+        sendRender();
+      }
+    }
+
+    // Function to detect content format
+    function detectFormat(content) {
+      if (!content || !content.trim()) return 'application/json';
+
+      // Try to parse as JSON first
+      try {
+        JSON.parse(content);
+        return 'application/json';
+      } catch (e) {
+        // If JSON fails, check for YAML indicators
+        const trimmed = content.trim();
+        if (trimmed.includes(':') && !trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+          return 'text/x-yaml';
+        }
+        return 'text/plain';
+      }
+    }
+
+    // Function to detect result format
+    function detectResultFormat(content) {
+      if (!content || !content.trim()) return 'text/plain';
+
+      try {
+        JSON.parse(content);
+        return 'application/json';
+      } catch (e) {
+        // Check for XML
+        if (content.trim().startsWith('<') && content.trim().endsWith('>')) {
+          return 'application/xml';
+        }
+        // Check for YAML
+        if (content.includes(':') && !content.startsWith('{') && !content.startsWith('[')) {
+          return 'text/x-yaml';
+        }
+        return 'text/plain';
+      }
+    }
+
+    // Function to update input format selector
+    function updateInputFormat(content) {
+      const format = detectFormat(content);
+      $('#input-mode').val(format);
+      inputEditor.setOption('mode', format);
+    }
+
+    // Function to update result format selector
+    function updateResultFormat(content) {
+      const format = detectResultFormat(content);
+      $('#result-mode').val(format);
+      resultEditor.setOption('mode', format);
+    }
+
+    function applyTheme(theme) {
+      $('body').toggleClass('dark-mode', theme==='dark');
+      $('.card, .modal-content').toggleClass('dark-mode', theme==='dark');
+      inputEditor.setOption('theme', themes[theme]);
+      jinjaEditor.setOption('theme', themes[theme]);
+      resultEditor.setOption('theme', themes[theme]);
+    }
+
+    function loadHistoryList() {
+      $.getJSON('/history', data => {
+        const sel = $('#history-select').empty().append('<option value="">-- Select past entry --</option>');
+        historyMap = data;
+
+        // Reverse the data array to show newest entries first
+        const reversedData = [...data].reverse();
+
+        reversedData.forEach((e,i) => {
+          // Check if loop is enabled and build loop info
+          let loopInfo = '';
+          if (e.enable_loop === true && e.loop_variable) {
+            // Loop variable is already in plain text
+            loopInfo = ` |-| [Loop: ${e.loop_variable}]`;
+          }
+
+          const optionText = `${e.datetime} |-| ${e.expr.slice(0,80).replace(/\n/g,' ')} |-| ${e.input.slice(0,80).replace(/\n/g,' ')}${loopInfo}`;
+          // Use original index from historyMap for value, not reversed index
+          const originalIndex = data.length - 1 - i;
+          sel.append(`<option value="${originalIndex}">${optionText}</option>`);
+        });
+      });
+    }
+
+    function loadInputFilesList() {
+      $.getJSON('/input-files', data => {
+        const sel = $('#input-files-select').empty().append('<option value="">-- Select input file --</option>');
+        if (data.length > 0) {
+          $('#input-files-container').show();
+          data.forEach(filename => sel.append(`<option value="${filename}">${filename}</option>`));
+        } else {
+          $('#input-files-container').hide();
+        }
+      });
+    }
+
+    function loadInputFileContent(filename) {
+      if (!filename) return;
+      $.get(`/input-file-content?filename=${encodeURIComponent(filename)}`)
+        .done(content => {
+          inputEditor.setValue(content);
+          updateInputFormat(content);
+          sendRender();
+        })
+        .fail(() => {
+          alert('Error loading file content');
+        });
+    }
+
+    function setupInputFilesRefresh(intervalSeconds) {
+      if (inputFilesRefreshInterval) {
+        clearInterval(inputFilesRefreshInterval);
+      }
+      if (intervalSeconds > 0) {
+        inputFilesRefreshInterval = setInterval(loadInputFilesList, intervalSeconds * 1000);
+      }
+    }
+
+    function setupHistoryRefresh(intervalSeconds) {
+      if (historyRefreshInterval) {
+        clearInterval(historyRefreshInterval);
+      }
+      if (intervalSeconds > 0) {
+        historyRefreshInterval = setInterval(loadHistoryList, intervalSeconds * 1000);
+      }
+    }
+
+    function clearAllEditors() {
+      inputEditor.setValue('');
+      jinjaEditor.setValue('{{ data }}');
+      resultEditor.setValue('');
+      $('#history-select').val('');
+      $('#input-files-select').val('');
+      // Reset format selectors to default
+      $('#input-mode').val('application/json');
+      $('#result-mode').val('application/json');
+      inputEditor.setOption('mode', 'application/json');
+      resultEditor.setOption('mode', 'application/json');
+    }
+
+    // Utility to download editor content with dynamic extension
+    function downloadContent(editor, filename) {
+      const content = editor.getValue();
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Get file extension based on CodeMirror mode
+    function getExtensionFromMode(mode) {
+      const extensions = {
+        'application/json': 'json',
+        'text/x-yaml': 'yaml',
+        'application/xml': 'xml',
+        'text/plain': 'txt',
+        'jinja2': 'j2'
+      };
+      return extensions[mode] || 'txt';
+    }
+
+    // Download input content with dynamic extension
+    function downloadInputContent() {
+      const mode = inputEditor.getOption('mode');
+      const extension = getExtensionFromMode(mode);
+      downloadContent(inputEditor, `input.${extension}`);
+    }
+
+    // Download expression content
+    function downloadExpressionContent() {
+      downloadContent(jinjaEditor, 'jinja2_expression.j2');
+    }
+
+    // Download result content with dynamic extension
+    function downloadResultContent() {
+      const mode = resultEditor.getOption('mode');
+      const extension = getExtensionFromMode(mode);
+      downloadContent(resultEditor, `result.${extension}`);
+    }
+
+    $(document).ready(() => {
+      inputEditor = CodeMirror.fromTextArea($('#inputcode')[0], { mode:'application/json',
+        lineNumbers:true, lineWrapping:true, tabSize:2 });
+      jinjaEditor = CodeMirror.fromTextArea($('#jinjacodetemplate')[0], { mode:'jinja2',
+        lineNumbers:true, lineWrapping:true, tabSize:2 });
+      resultEditor = CodeMirror.fromTextArea($('#resultview')[0], { mode:'application/json',
+        lineNumbers:true, readOnly:true, lineWrapping:true, tabSize:2 });
+
+      $('#settingsModal').on('show.bs.modal', () => {
+        $.getJSON('/settings?section=user', s => {
+          $('#theme-select').val(s.theme||'dark');
+          $('#height-inputcode').val(s['height-inputcode']||100);
+          $('#height-jinjaexpr').val(s['height-jinjaexpr']||100);
+          $('#height-resultview').val(s['height-resultview']||1000);
+        });
+        $.getJSON('/settings?section=input_files', s => {
+          $('#input-files-directory').val(s.directory||'');
+          $('#input-files-refresh').val(s.refresh_interval||'1');
+        });
+      });
+
+      $('#save-settings').click(() => {
+        const userPayload = {
+          section:'user',
+          theme:$('#theme-select').val(),
+          'height-inputcode':$('#height-inputcode').val(),
+          'height-jinjaexpr':$('#height-jinjaexpr').val(),
+          'height-resultview':$('#height-resultview').val()
+        };
+        const inputFilesPayload = {
+          section:'input_files',
+          directory:$('#input-files-directory').val(),
+          refresh_interval:$('#input-files-refresh').val()
+        };
+
+        $.post('/settings', userPayload).done(() => {
+          currentTheme = userPayload.theme;
+          applyTheme(currentTheme);
+          inputEditor.setSize('100%', +userPayload['height-inputcode']);
+          jinjaEditor.setSize('100%', +userPayload['height-jinjaexpr']);
+          resultEditor.setSize('100%', +userPayload['height-resultview']);
+
+          $.post('/settings', inputFilesPayload).done(() => {
+            setupInputFilesRefresh(+inputFilesPayload.refresh_interval);
+            setupHistoryRefresh(+inputFilesPayload.refresh_interval);
+            loadInputFilesList();
+            $('#settingsModal').modal('hide');
+            loadHistoryList();
+          });
+        });
+      });
+
+      $('#reset-heights').click(() => {
+        const defs = { 'height-inputcode':100, 'height-jinjaexpr':100, 'height-resultview':1000 };
+        const payload = Object.assign({ section:'user' }, defs);
+        $.post('/settings', payload).done(() => {
+          inputEditor.setSize('100%', defs['height-inputcode']);
+          jinjaEditor.setSize('100%', defs['height-jinjaexpr']);
+          resultEditor.setSize('100%', defs['height-resultview']);
+          $('#height-inputcode').val(defs['height-inputcode']);
+          $('#height-jinjaexpr').val(defs['height-jinjaexpr']);
+          $('#height-resultview').val(defs['height-resultview']);
+        });
+      });
+
+      $('#input-mode').change(()=>inputEditor.setOption('mode',$('#input-mode').val()));
+      $('#upload-form').submit(e => {
+        e.preventDefault();
+        const selectedFile=$('#jsonfile')[0].files[0];
+        if(selectedFile) {
+          const fileReader=new FileReader();
+          fileReader.onload=evt=>{
+            const content = evt.target.result;
+            inputEditor.setValue(content);
+            updateInputFormat(content);
+            jinjaEditor.setValue('{{ data }}');
+            sendRender();
+          };
+          fileReader.readAsText(selectedFile);
+        }
+      });
+      inputEditor.on('change',function() {
+        updateInputFormat(inputEditor.getValue());
+        sendRender();
+      });
+      jinjaEditor.on('change',sendRender);
+      if(!jinjaEditor.getValue())jinjaEditor.setValue('{{ data }}');
+      $('#result-mode').change(()=>resultEditor.setOption('mode',$('#result-mode').val()));
+      $('#history-select').change(()=>{
+        const idx=$('#history-select').val(); if(idx==='')return;
+        const historyEntry=historyMap[idx];
+
+        // Use values directly (already decoded by Python backend)
+        inputEditor.setValue(historyEntry.input);
+        updateInputFormat(historyEntry.input);
+        jinjaEditor.setValue(historyEntry.expr);
+
+        // Restore loop settings if they exist
+        if (historyEntry.enable_loop !== undefined) {
+          const enableLoop = historyEntry.enable_loop === true;
+          document.getElementById('enable-loop').checked = enableLoop;
+
+          // Show/hide loop controls based on the setting (without auto-render)
+          toggleLoopControls(false);
+
+          // Restore loop variable if it exists
+          if (historyEntry.loop_variable !== undefined && historyEntry.loop_variable !== '') {
+            document.getElementById('loop-variable').value = historyEntry.loop_variable;
+          } else {
+            document.getElementById('loop-variable').value = '';
+          }
+        } else {
+          // Default to disabled if no loop settings in history
+          document.getElementById('enable-loop').checked = false;
+          document.getElementById('loop-variable').value = '';
+          toggleLoopControls(false);
+        }
+
+        sendRender();
+      });
+
+      $('#input-files-select').change(function() {
+        const filename = $(this).val();
+        if (filename) {
+          loadInputFileContent(filename);
+        }
+      });
+
+      // Auto-render when loop variable changes
+      $('#loop-variable').on('input', sendRender);
+
+      $('#clear-all').click(() => {
+        clearAllEditors();
+      });
+
+      $.getJSON('/settings?section=user', userSettings=>{
+        currentTheme=userSettings.theme||'dark'; applyTheme(currentTheme);
+        inputEditor.setSize('100%',+userSettings['height-inputcode']||100);
+        jinjaEditor.setSize('100%',+userSettings['height-jinjaexpr']||100);
+        resultEditor.setSize('100%',+userSettings['height-resultview']||1000);
+        loadHistoryList(); sendRender();
+      });
+
+      $.getJSON('/settings?section=input_files', inputFileSettings => {
+        const refreshInterval = +(inputFileSettings.refresh_interval || '1');
+        setupInputFilesRefresh(refreshInterval);
+        setupHistoryRefresh(refreshInterval);
+        loadInputFilesList();
+      });
+
+      function sendRender(){
+        const enableLoop = document.getElementById('enable-loop').checked;
+        const loopVariable = document.getElementById('loop-variable').value.trim();
+
+        const requestData = {
+          json: inputEditor.getValue(),
+          expr: jinjaEditor.getValue(),
+          enable_loop: enableLoop,
+          loop_variable: loopVariable
+        };
+
+        $.post('/render', requestData)
+        .done((d,_,xhr)=>{
+          const rt=xhr.getResponseHeader('X-Result-Type')||'string';
+          const inputFormat=xhr.getResponseHeader('X-Input-Format')||'';
+          const loopEnabled=xhr.getResponseHeader('X-Loop-Enabled')||'';
+
+          let typeText = inputFormat ? `(${rt}, input: ${inputFormat})` : `(${rt})`;
+          if (loopEnabled) {
+            typeText += ' [LOOP MODE]';
+          }
+          $('#result-type').text(typeText);
+
+          // Update result format and content
+          updateResultFormat(d);
+          try{const p=JSON.parse(d);resultEditor.setValue(JSON.stringify(p,null,2));}catch{resultEditor.setValue(d);}
+        })
+        .fail(xhr=>{
+          const errorText = 'Error:'+xhr.responseText;
+          resultEditor.setValue(errorText);
+          updateResultFormat(errorText);
+          $('#result-type').text('(error)');
+        });
+      }
+    });
+  </script>
+
+  <!-- Spacer for easier CodeMirror resizing -->
+  <div style="height: 300px;"></div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "example": "Ansible loop simulation example",
+  "purpose": "Demonstrate loop functionality with item variable",
+  "data": {
+    "servers": [
+      {
+        "name": "web-server-1",
+        "ip": "192.168.1.10",
+        "role": "webserver",
+        "environment": "production"
+      },
+      {
+        "name": "web-server-2", 
+        "ip": "192.168.1.11",
+        "role": "webserver",
+        "environment": "production"
+      },
+      {
+        "name": "db-server-1",
+        "ip": "192.168.1.20",
+        "role": "database",
+        "environment": "production"
+      }
+    ],
+    "users": ["alice", "bob", "charlie"],
+    "environments": [
+      {"name": "development", "domain": "dev.example.com"},
+      {"name": "staging", "domain": "staging.example.com"},
+      {"name": "production", "domain": "example.com"}
+    ],
+    "packages": [
+      "nginx",
+      "mysql-server", 
+      "python3",
+      "git",
+      "vim"
+    ]
+  }
+}

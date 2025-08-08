@@ -1,0 +1,11 @@
+__pycache__/
+**/__pycache__/
+*.py[codz]
+*$py.class
+.vscode
+.copilotrc
+**/ansible_jinja2_playground_history.json
+.lh/
+**/.lh/
+podman-dirs
+git.sh

@@ -1,0 +1,42 @@
+# Podman Compose file for Ansible Jinja2 Playground
+# Usage: podman-compose up -d
+
+version: '3.8'
+
+services:
+  ansible-jinja2-playground:
+    # Use newly built image
+    image: localhost/ansible-jinja2-playground:latest
+    container_name: ansible-jinja2-playground
+
+    # Port mapping
+    ports:
+      - "8000:8000"
+
+    # Environment variables
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - ANSIBLE_LOCAL_TEMP=/tmp/.ansible/tmp
+      - ANSIBLE_REMOTE_TEMP=/tmp/.ansible/tmp
+
+    # Volume mounts using podman-dirs
+    volumes:
+      # Map podman-dirs subdirectories to container paths
+      - ./podman-dirs/conf:/home/playground/app/conf
+      - ./podman-dirs/inputs:/home/playground/app/inputs:ro
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Security settings
+    user: "1000:1000"
+
+    # Temporary filesystems for writable areas
+    tmpfs:
+      - /tmp
+      - /home/playground/.cache
+      - /opt/app-root/src/.ansible
+
+
+
