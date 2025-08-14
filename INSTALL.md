@@ -1,4 +1,4 @@
-# Installation Guide - Ansible Jinja2 Playground
+# Installation Guide - Ansible Jinja2 Playground v2.1
 
 This guide provides step-by-step instructions for setting up the Ansible Jinja2 Playground on your system.
 
@@ -7,8 +7,9 @@ This guide provides step-by-step instructions for setting up the Ansible Jinja2 
 ### System Requirements
 - **Operating System**: Linux (Ubuntu/Debian, CentOS/RHEL, Fedora), macOS, or Windows WSL2
 - **Python**: Version 3.9 or higher
+- **Ansible**: Version 2.14+ (for full compatibility)
 - **Memory**: Minimum 512MB RAM
-- **Storage**: 100MB free disk space
+- **Storage**: 150MB free disk space
 - **Network**: Internet connection for package downloads
 
 ### Required Software
@@ -16,6 +17,7 @@ This guide provides step-by-step instructions for setting up the Ansible Jinja2 
 - pip (Python package manager)
 - virtualenv or venv
 - git (for cloning repository)
+- Ansible 2.14+ (automatically installed with requirements)
 
 ## Installation Methods
 
@@ -87,6 +89,29 @@ pip install -r pip-venv-requirements.txt
 #### 5. Verify Installation
 ```bash
 python run.py --version
+```
+
+#### 6. Test New Features (v2.1)
+
+Test the Ansible compatibility scanner:
+```bash
+# Start the server in background
+python run.py &
+
+# Run compatibility scan
+python scan_ansible_filters.py --report-only
+
+# Kill background server
+pkill -f "python run.py"
+```
+
+Test the history cleanup utility:
+```bash
+# Check for duplicate entries
+python deduplicate_history.py --dry-run
+
+# View help for all options
+python deduplicate_history.py --help
 ```
 
 ### Method 2: System-wide Installation

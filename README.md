@@ -2,47 +2,61 @@
 
 An interactive web application for testing and experimenting with Jinja2 templates using Ansible filters and loop functionality.
 
-![Version](https://img.shields.io/badge/version-1.2-blue.svg)
+![Version](https://img.shields.io/badge/version-2.1-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.9+-green.svg)
+![Ansible](https://img.shields.io/badge/ansible-2.14+-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## Overview
 
-The Ansible Jinja2 Playground provides a user-friendly interface to:
+The Ansible Jinja2 Playground provides a comprehensive development environment for:
 
 - **Test Jinja2 templates** with real-time rendering
-- **Use Ansible filters** (core, math, URL filters)
+- **Use 100+ Ansible filters** across 9 modules with full compatibility
 - **Simulate Ansible loops** with custom variables
 - **Load sample data** from JSON/YAML files
 - **Save and manage history** of your experiments
 - **Auto-refresh** input files and history
+- **Scan Ansible compatibility** with automated testing
 
 ## Key Features
 
 ### 🎯 **Template Processing**
+
 - Real-time Jinja2 template rendering
-- Full Ansible filter support (core, math, URLs)
+- 100+ Ansible filters across 9 modules (core, math, URLs, encryption, etc.)
 - JSON and YAML input data formats
 - Syntax highlighting with multiple themes
 - Sandboxed environment for secure execution
 
 ### 🔄 **Loop Simulation**
+
 - Ansible-style loop functionality
 - Custom loop variable names
 - Boolean-based loop controls
 - Integration with template rendering
 
 ### 📁 **File Management**
+
 - Auto-loading from input files directory
 - Cross-browser compatible file uploads
 - Real-time file list updates
 - Security-validated file access
 
 ### 📊 **History & Settings**
+
 - Persistent interaction history
 - Reverse chronological ordering
 - Configurable auto-refresh intervals
 - Theme and UI customization
+
+### 🔍 **Compatibility Scanner** *(NEW in v2.1)*
+
+- Automated Ansible filter and test discovery
+- Real-time compatibility testing via HTTP endpoints
+- Comprehensive compatibility reports (text and JSON)
+- Version-specific compatibility verification
+- 68 filters and 47 tests coverage across 9 Ansible modules
 
 ## Quick Start
 
@@ -167,6 +181,20 @@ ansible_jinja2_playground/
 - **Editors**: CodeMirror with syntax highlighting
 - **Data Formats**: JSON, YAML support
 - **Security**: Path traversal protection, input validation
+
+## Utilities
+
+### 🔍 Ansible Compatibility Scanner
+```bash
+python scan_ansible_filters.py
+```
+Comprehensive scanner for testing Ansible filter and test compatibility with automatic discovery and HTTP endpoint validation.
+
+### 🧹 History Cleanup Tool
+```bash
+python deduplicate_history.py
+```
+Smart duplicate detection and removal tool for maintaining clean interaction history with base64 content comparison.
 
 ## Browser Compatibility
 

@@ -13,6 +13,12 @@ from jinja2 import StrictUndefined
 from ansible.plugins.filter.core import FilterModule as CoreFilters
 from ansible.plugins.filter.mathstuff import FilterModule as MathFilters
 from ansible.plugins.filter.urls import FilterModule as UrlFilters
+from ansible.plugins.filter.urlsplit import FilterModule as UrlSplitFilters
+from ansible.plugins.filter.encryption import FilterModule as EncryptionFilters
+from ansible.plugins.test.core import TestModule as CoreTests
+from ansible.plugins.test.files import TestModule as FileTests
+from ansible.plugins.test.mathstuff import TestModule as MathTests
+from ansible.plugins.test.uri import TestModule as UriTests
 
 CURRENT_DIR = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
@@ -168,6 +174,15 @@ env = Environment(
 env.filters.update(CoreFilters().filters())
 env.filters.update(MathFilters().filters())
 env.filters.update(UrlFilters().filters())
+env.filters.update(UrlSplitFilters().filters())
+env.filters.update(EncryptionFilters().filters())
+
+# Adiciona todos os testes extras do Ansible-core
+env.tests.update(CoreTests().tests())
+env.tests.update(FileTests().tests())
+env.tests.update(MathTests().tests())
+env.tests.update(UriTests().tests())
+
 
 class JinjaHandler(BaseHTTPRequestHandler):
   def _send_headers(self, status=200, content_type='text/html', extra_headers=None):

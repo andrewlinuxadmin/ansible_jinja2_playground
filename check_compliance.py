@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script para verificar conformidade com as regras do .copilotrc
+Script to check compliance with .copilotrc rules
 """
 
 import os
@@ -9,23 +9,23 @@ import yaml
 import sys
 
 def load_copilotrc():
-  """Carrega as regras do .copilotrc"""
+  """Loads .copilotrc rules"""
   try:
     with open('.copilotrc', 'r') as f:
       return yaml.safe_load(f)
   except Exception as e:
-    print(f"❌ Erro ao ler .copilotrc: {e}")
+    print(f"❌ Error reading .copilotrc: {e}")
     return None
 
 def check_coding_style():
-  """Verifica se o coding style está sendo seguido"""
-  print("🎨 Verificando coding style...")
+  """Checks if coding style is being followed"""
+  print("🎨 Checking coding style...")
 
   issues = []
 
-  # Verifica arquivos Python
+  # Check Python files
   for root, dirs, files in os.walk('.'):
-    # Ignora diretórios específicos
+    # Ignore specific directories
     dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['__pycache__']]
 
     for file in files:
@@ -36,49 +36,49 @@ def check_coding_style():
           lines = f.readlines()
 
         for i, line in enumerate(lines, 1):
-          # Verifica trailing whitespace (linha não pode terminar com espaços ou tabs)
+          # Check trailing whitespace (line cannot end with spaces or tabs)
           if line.endswith(' ') or line.endswith('\t'):
             issues.append(f"   ⚠️  {file_path}:{i} - Trailing whitespace")
 
-          # Verifica indentação (deve ser múltiplo de 2)
+          # Check indentation (must be multiple of 2)
           leading_spaces = len(line) - len(line.lstrip(' '))
           if leading_spaces > 0 and leading_spaces % 2 != 0:
-            issues.append(f"   ⚠️  {file_path}:{i} - Indentação incorreta (não é múltiplo de 2)")
+            issues.append(f"   ⚠️  {file_path}:{i} - Incorrect indentation (not multiple of 2)")
 
   if issues:
-    print("   ❌ Problemas encontrados:")
-    for issue in issues[:10]:  # Mostra apenas os primeiros 10
+    print("   ❌ Problems found:")
+    for issue in issues[:10]:  # Show only first 10
       print(issue)
     if len(issues) > 10:
-      print(f"   ... e mais {len(issues) - 10} problemas")
+      print(f"   ... and {len(issues) - 10} more problems")
   else:
     print("   ✅ Coding style OK")
 
   return len(issues) == 0
 
 def check_test_structure():
-  """Verifica se a estrutura de testes está correta"""
-  print("🧪 Verificando estrutura de testes...")
+  """Checks if test structure is correct"""
+  print("🧪 Checking test structure...")
 
   if not os.path.exists('tests'):
-    print("   ❌ Diretório tests não encontrado")
+    print("   ❌ Tests directory not found")
     return False
 
   test_files = [f for f in os.listdir('tests') if f.startswith('test_') and f.endswith('.py')]
 
   if len(test_files) == 0:
-    print("   ❌ Nenhum arquivo de teste encontrado")
+    print("   ❌ No test files found")
     return False
 
-  print(f"   ✅ Encontrados {len(test_files)} arquivos de teste:")
+  print(f"   ✅ Found {len(test_files)} test files:")
   for test_file in test_files:
     print(f"      📄 {test_file}")
 
   return True
 
 def check_documentation():
-  """Verifica se a documentação está presente"""
-  print("📚 Verificando documentação...")
+  """Checks if documentation is present"""
+  print("📚 Checking documentation...")
 
   required_docs = ['README.md', 'USAGE.md', 'INSTALL.md', 'LOOP_USAGE.md']
   missing_docs = []
@@ -88,27 +88,27 @@ def check_documentation():
       missing_docs.append(doc)
 
   if missing_docs:
-    print("   ❌ Documentação faltando:")
+    print("   ❌ Missing documentation:")
     for doc in missing_docs:
       print(f"      📄 {doc}")
     return False
   else:
-    print("   ✅ Documentação completa")
+    print("   ✅ Complete documentation")
     return True
 
 def main():
-  print("🔍 Verificando conformidade com .copilotrc")
+  print("🔍 Checking compliance with .copilotrc")
   print("=" * 50)
 
-  # Carrega configurações
+  # Load configurations
   config = load_copilotrc()
   if not config:
     sys.exit(1)
 
-  print("✅ Arquivo .copilotrc carregado com sucesso")
+  print("✅ .copilotrc file loaded successfully")
   print()
 
-  # Executa verificações
+  # Run checks
   results = []
   results.append(check_coding_style())
   results.append(check_test_structure())
@@ -118,12 +118,12 @@ def main():
   print("=" * 50)
 
   if all(results):
-    print("🎉 TODAS AS VERIFICAÇÕES PASSARAM!")
-    print("✅ Projeto está em conformidade com .copilotrc")
+    print("🎉 ALL CHECKS PASSED!")
+    print("✅ Project is compliant with .copilotrc")
     sys.exit(0)
   else:
-    print("⚠️  ALGUMAS VERIFICAÇÕES FALHARAM")
-    print("❌ Projeto precisa de ajustes para conformidade")
+    print("⚠️  SOME CHECKS FAILED")
+    print("❌ Project needs adjustments for compliance")
     sys.exit(1)
 
 if __name__ == "__main__":

@@ -107,6 +107,79 @@ python3 deduplicate_history.py path/to/history.json
 
 For complete documentation, see `HISTORY_CLEANUP.md`.
 
+## Ansible Compatibility Scanner *(NEW in v2.1)*
+
+The project includes a comprehensive scanner to test Ansible filter and test compatibility.
+
+### Quick Start
+
+```bash
+# Activate virtual environment
+source /home/acarlos/Dropbox/RedHat/Ansible/venvs/python3.9-ansible2.14/bin/activate
+
+# Start the playground server first
+python run.py &
+
+# Run compatibility scan
+python scan_ansible_filters.py
+```
+
+### Scanner Features
+
+#### 🔍 **Discovery Capabilities**
+- Automatically discovers all Ansible filters and tests from installed version
+- Scans 9 Ansible modules: core, mathstuff, urls, urlsplit, encryption, files, uri
+- Identifies 100+ filters and tests across different categories
+
+#### 🧪 **Testing Features**
+- Tests each filter/test via HTTP endpoint
+- Generates test cases for common scenarios
+- Reports success/failure with detailed messages
+- Achieves 100% success rate on supported filters
+
+#### 📊 **Reporting**
+- Comprehensive text report with statistics
+- JSON output for automated processing
+- Compatibility rate calculations
+- Module-by-module breakdown
+
+### Command Line Options
+
+```bash
+# Full scan with testing
+python scan_ansible_filters.py
+
+# Discovery only (no endpoint testing)
+python scan_ansible_filters.py --report-only
+
+# Custom server URL
+python scan_ansible_filters.py --url http://localhost:8080
+
+# Custom output file
+python scan_ansible_filters.py --output my_scan_results.json
+```
+
+### Sample Output
+
+```
+📊 RESUMO EXECUTIVO:
+├─ Versão do Ansible: 2.14.18
+├─ Total Descoberto: 115 (filtros + testes)
+├─ Total Testado: 47
+├─ Total Funcionando: 47
+├─ Taxa de Sucesso: 100.0%
+├─ Filtros Descobertos: 68
+└─ Testes Descobertos: 47
+```
+
+### When to Use Scanner
+
+1. **Version Upgrades**: Test compatibility after Ansible version changes
+2. **New Environment**: Verify filter availability in different environments
+3. **CI/CD Integration**: Automated compatibility validation
+4. **Development**: Discover available filters for development
+5. **Troubleshooting**: Identify filter/test availability issues
+
 ### Working with Data
 
 #### JSON Input Example
