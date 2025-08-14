@@ -5,6 +5,7 @@ This document explains the loop functionality in the Ansible Jinja2 Playground, 
 ## Overview
 
 The loop functionality enables you to:
+
 - Process each element of an array separately
 - Define custom loop variable names
 - Test templates against individual data items
@@ -15,11 +16,13 @@ The loop functionality enables you to:
 ### Standard Processing vs Loop Processing
 
 #### Without Loop (Standard)
+
 - Template receives the entire data structure
 - You must write explicit loops in Jinja2
 - Data passed as-is to template engine
 
 #### With Loop Enabled
+
 - Each array element is processed individually
 - Template runs once per array item
 - Loop variable contains current item
@@ -28,11 +31,13 @@ The loop functionality enables you to:
 ## Enabling Loop Functionality
 
 ### Frontend Interface
+
 1. **Checkbox Control**: Check "Enable Loop" checkbox
 2. **Variable Name**: Enter custom loop variable name (default: "item")
 3. **Auto-processing**: Template automatically processes each array element
 
 ### Backend API
+
 ```http
 POST /render
 Content-Type: application/x-www-form-urlencoded
@@ -45,6 +50,7 @@ json=[{"name":"server1"},{"name":"server2"}]&expr=Server: {{ item.name }}&enable
 ### Supported Input Formats
 
 #### JSON Array
+
 ```json
 [
   {"name": "web01", "ip": "192.168.1.10"},
@@ -54,6 +60,7 @@ json=[{"name":"server1"},{"name":"server2"}]&expr=Server: {{ item.name }}&enable
 ```
 
 #### YAML Array
+
 ```yaml
 - name: web01
   ip: 192.168.1.10
@@ -64,6 +71,7 @@ json=[{"name":"server1"},{"name":"server2"}]&expr=Server: {{ item.name }}&enable
 ```
 
 #### Nested Array Data
+
 ```json
 {
   "servers": [
@@ -77,6 +85,7 @@ json=[{"name":"server1"},{"name":"server2"}]&expr=Server: {{ item.name }}&enable
 ### Loop Variable Access
 
 #### With Array Root Data
+
 ```jinja2
 # Loop Variable: item
 # Template processes each server individually
@@ -86,6 +95,7 @@ Role: {{ item.role | default('unknown') }}
 ```
 
 #### With Nested Array Data
+
 ```jinja2
 # Loop Variable: server
 # Template accesses: servers array + environment
@@ -99,6 +109,7 @@ Server Role: {{ server.role }}
 ### Example 1: Basic Server Configuration
 
 #### Input Data
+
 ```json
 [
   {"hostname": "web01", "ip": "10.0.1.10", "role": "web"},
@@ -108,6 +119,7 @@ Server Role: {{ server.role }}
 ```
 
 #### Template
+
 ```jinja2
 Host: {{ item.hostname }}
 IP Address: {{ item.ip }}
@@ -116,10 +128,12 @@ FQDN: {{ item.hostname }}.example.com
 ```
 
 #### Settings
+
 - **Enable Loop**: ✓ Checked
 - **Loop Variable**: `item`
 
 #### Output
+
 ```
 Host: web01
 IP Address: 10.0.1.10
@@ -140,6 +154,7 @@ FQDN: db01.example.com
 ### Example 2: User Account Generation
 
 #### Input Data
+
 ```json
 [
   {"username": "alice", "uid": 1001, "groups": ["users", "developers"]},
@@ -149,6 +164,7 @@ FQDN: db01.example.com
 ```
 
 #### Template
+
 ```jinja2
 # User: {{ user.username }}
 useradd -u {{ user.uid }} -G {{ user.groups | join(',') }} {{ user.username }}
@@ -156,10 +172,12 @@ echo "User {{ user.username }} created with UID {{ user.uid }}"
 ```
 
 #### Settings
+
 - **Enable Loop**: ✓ Checked
 - **Loop Variable**: `user`
 
 #### Output
+
 ```bash
 # User: alice
 useradd -u 1001 -G users,developers alice
@@ -177,6 +195,7 @@ echo "User charlie created with UID 1003"
 ### Example 3: Configuration Files with Context
 
 #### Input Data
+
 ```json
 {
   "domain": "example.com",
@@ -189,6 +208,7 @@ echo "User charlie created with UID 1003"
 ```
 
 #### Template
+
 ```jinja2
 # {{ env.name | upper }} Environment Configuration
 server {
@@ -208,6 +228,7 @@ server {
 ```
 
 #### Settings
+
 - **Enable Loop**: ✓ Checked
 - **Loop Variable**: `env`
 - **Note**: Loop processes `environments` array, but `domain` is accessible globally
@@ -215,6 +236,7 @@ server {
 ### Example 4: Ansible Task Simulation
 
 #### Input Data
+
 ```yaml
 - package: nginx
   state: present
@@ -228,6 +250,7 @@ server {
 ```
 
 #### Template
+
 ```jinja2
 - name: Install {{ task.package }}
   package:
@@ -242,12 +265,14 @@ server {
 ```
 
 #### Settings
+
 - **Enable Loop**: ✓ Checked
 - **Loop Variable**: `task`
 
 ## Advanced Loop Patterns
 
 ### Pattern 1: Conditional Processing
+
 ```jinja2
 {% if item.enabled | default(true) %}
 Server: {{ item.name }} is ENABLED
@@ -258,6 +283,7 @@ Server: {{ item.name }} is DISABLED
 ```
 
 ### Pattern 2: Complex Data Structures
+
 ```jinja2
 # Processing: {{ item.name }}
 {% for interface in item.interfaces %}
@@ -270,6 +296,7 @@ Mount {{ mount.device }} on {{ mount.path }}
 ```
 
 ### Pattern 3: Environment Variables
+
 ```jinja2
 export {{ item.name | upper }}_HOST="{{ item.hostname }}"
 export {{ item.name | upper }}_PORT="{{ item.port }}"
@@ -279,21 +306,25 @@ export {{ item.name | upper }}_ENV="{{ item.environment }}"
 ## Best Practices
 
 ### 1. Variable Naming
+
 - Use descriptive loop variable names
 - Common patterns: `item`, `server`, `user`, `host`, `task`
 - Match variable name to data context
 
 ### 2. Data Structure Design
+
 - Keep array elements consistent in structure
 - Use default filters for optional fields
 - Validate data before processing
 
 ### 3. Template Organization
+
 - Start with simple templates
 - Test with small datasets first
 - Use comments to document complex logic
 
 ### 4. Error Handling
+
 ```jinja2
 {% if item.name is defined %}
 Name: {{ item.name }}
@@ -310,33 +341,41 @@ Name: {{ item.name | default('UNKNOWN') }}
 ### Common Issues
 
 #### 1. Loop Not Processing
+
 **Problem**: Template shows entire array instead of individual items
 
 **Solutions**:
+
 - Verify "Enable Loop" checkbox is checked
 - Ensure input data is an array format
 - Check loop variable name matches template usage
 
 #### 2. Variable Not Found
+
 **Problem**: Template error "variable not defined"
 
 **Solutions**:
+
 - Check loop variable name spelling
 - Verify data structure contains expected fields
 - Use `default` filter for optional fields
 
 #### 3. Empty Results
+
 **Problem**: No output when loop is enabled
 
 **Solutions**:
+
 - Verify input data is valid JSON/YAML array
 - Check array is not empty
 - Ensure template syntax is correct
 
 #### 4. Global Variables Not Accessible
+
 **Problem**: Variables outside array not available in template
 
 **Solutions**:
+
 - For nested objects, global variables remain accessible
 - For root arrays, only current item is available
 - Restructure data to include global context
@@ -344,6 +383,7 @@ Name: {{ item.name | default('UNKNOWN') }}
 ### Debug Techniques
 
 #### 1. Inspect Current Item
+
 ```jinja2
 DEBUG: Current item structure
 {{ item | to_json }}
@@ -355,12 +395,14 @@ DEBUG: Available variables
 ```
 
 #### 2. Test with Simple Template
+
 ```jinja2
 Item: {{ item }}
 Type: {{ item.__class__.__name__ }}
 ```
 
 #### 3. Validate Data Format
+
 - Use JSON/YAML validators
 - Test with minimal data sets
 - Check array structure
@@ -368,16 +410,19 @@ Type: {{ item.__class__.__name__ }}
 ## Performance Considerations
 
 ### 1. Large Arrays
+
 - Loop processing handles large arrays efficiently
 - Each item processed separately reduces memory usage
 - Consider pagination for very large datasets
 
 ### 2. Complex Templates
+
 - Simple templates process faster
 - Avoid deeply nested loops within templates
 - Use filters instead of complex logic
 
 ### 3. Output Size
+
 - Large arrays produce large output
 - Consider output format selection
 - Monitor result size for display limitations
@@ -385,6 +430,7 @@ Type: {{ item.__class__.__name__ }}
 ## Integration with Ansible
 
 ### Simulating Ansible Loops
+
 The loop functionality simulates Ansible's `loop` and `with_items` behaviors:
 
 ```yaml
@@ -404,6 +450,7 @@ The loop functionality simulates Ansible's `loop` and `with_items` behaviors:
 ```
 
 ### Testing Ansible Templates
+
 1. Copy Ansible template content to playground
 2. Use same data structure as Ansible variables
 3. Enable loop with appropriate variable name

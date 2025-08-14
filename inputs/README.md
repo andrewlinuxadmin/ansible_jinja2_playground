@@ -1,6 +1,8 @@
 # Input Files Directory
 
-This directory contains sample input files for the Ansible Jinja2 Playground. Files placed here are automatically detected and made available through the "Load from Input Files" dropdown in the web interface.
+This directory contains sample input files for the Ansible Jinja2 Playground.
+Files placed here are automatically detected and made available through the
+"Load from Input Files" dropdown in the web interface.
 
 ## Supported File Formats
 
@@ -11,11 +13,13 @@ This directory contains sample input files for the Ansible Jinja2 Playground. Fi
 ## File Loading Behavior
 
 ### Auto-detection
+
 - Files are automatically scanned when the interface loads
 - Dropdown menu is populated with available files
 - File selection triggers immediate loading (no additional "Load File" button needed)
 
 ### File Validation
+
 - JSON files are validated for proper syntax
 - YAML files are parsed and validated
 - Invalid files are skipped with console warnings
@@ -23,7 +27,9 @@ This directory contains sample input files for the Ansible Jinja2 Playground. Fi
 ## Sample Files
 
 ### sample.json
+
 Basic JSON structure for testing simple templates:
+
 ```json
 {
   "users": ["alice", "bob", "charlie"],
@@ -33,7 +39,9 @@ Basic JSON structure for testing simple templates:
 ```
 
 ### sample.yaml
+
 YAML equivalent of the JSON sample:
+
 ```yaml
 users:
   - alice
@@ -44,7 +52,9 @@ version: 1.0.0
 ```
 
 ### loop_example.json
+
 Example data structure designed for loop functionality testing:
+
 ```json
 [
   {"name": "web01", "ip": "192.168.1.10", "role": "webserver"},
@@ -56,11 +66,13 @@ Example data structure designed for loop functionality testing:
 ## Adding Custom Files
 
 ### File Naming
+
 - Use descriptive names that indicate the file purpose
 - Include appropriate file extensions (`.json`, `.yaml`, `.yml`, `.txt`)
 - Avoid spaces and special characters in filenames
 
 ### Content Guidelines
+
 - Ensure JSON files are properly formatted and valid
 - Use consistent indentation in YAML files (2 or 4 spaces)
 - Include comments in YAML files to explain complex structures
@@ -69,6 +81,7 @@ Example data structure designed for loop functionality testing:
 ### Example Custom Files
 
 #### servers.json
+
 ```json
 {
   "servers": [
@@ -93,6 +106,7 @@ Example data structure designed for loop functionality testing:
 ```
 
 #### ansible_vars.yaml
+
 ```yaml
 # Ansible playbook variables example
 apache_packages:
@@ -118,6 +132,7 @@ mysql_databases:
 ## Working with Loop Data
 
 ### Array Structure for Loops
+
 When using the loop functionality, structure your data as arrays:
 
 ```json
@@ -129,6 +144,7 @@ When using the loop functionality, structure your data as arrays:
 ```
 
 ### Nested Loop Data
+
 For complex scenarios with global context:
 
 ```yaml
@@ -146,16 +162,19 @@ servers:
 ## File Management
 
 ### Organization Tips
+
 - Group related files by purpose (e.g., `web_servers.json`, `db_config.yaml`)
 - Use version numbers for evolving datasets (`config_v1.json`, `config_v2.json`)
 - Create backup copies before making major changes
 
 ### Cleanup
+
 - Remove unused or outdated files regularly
 - Keep file sizes reasonable for quick loading
 - Document file purposes in comments (YAML) or descriptive names
 
 ### Security Considerations
+
 - Avoid including sensitive data (passwords, API keys)
 - Use placeholder values for confidential information
 - Consider using Ansible Vault format for sensitive test data
@@ -163,18 +182,21 @@ servers:
 ## Troubleshooting
 
 ### File Not Appearing in Dropdown
+
 1. Check file extension is supported (`.json`, `.yaml`, `.yml`, `.txt`)
 2. Verify file is saved in the `inputs/` directory
 3. Refresh the web page to re-scan files
 4. Check browser console for parsing errors
 
 ### File Loading Errors
+
 1. Validate JSON syntax using online validators
 2. Check YAML indentation and structure
 3. Ensure file encoding is UTF-8
 4. Verify file permissions allow reading
 
 ### Large File Performance
+
 - Keep input files under 1MB for optimal performance
 - Use simplified datasets for testing complex templates
 - Consider breaking large files into smaller, focused examples
@@ -182,21 +204,26 @@ servers:
 ## Best Practices
 
 ### Data Design
+
 - Use realistic but simplified data structures
 - Include edge cases (empty arrays, null values, optional fields)
 - Provide both simple and complex examples
 - Document expected template behavior
 
 ### File Documentation
+
 - Use descriptive filenames
 - Include comments explaining data structure purpose
 - Provide example templates that work with the data
 - Document any special loop or filtering requirements
 
 ### Version Control
+
 - Track changes to input files
 - Use meaningful commit messages for file updates
 - Tag stable versions for reference
 - Document breaking changes to data structures
 
-This directory serves as your testing playground for various data structures and scenarios, enabling thorough template testing before deployment in real environments.
+This directory serves as your testing playground for various data structures
+and scenarios, enabling thorough template testing before deployment in real
+environments.

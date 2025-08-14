@@ -1,10 +1,12 @@
 # 🧪 Test Suite - Ansible Jinja2 Playground
 
-This directory contains a complete unit test suite for all API endpoints of the Ansible Jinja2 Playground.
+This directory contains a complete unit test suite for all API endpoints of the
+Ansible Jinja2 Playground.
 
 ## 📋 Overview
 
-The test suite covers **10 endpoints** with **63 tests** in total following strict coding style guidelines.
+The test suite covers **10 endpoints** with **63 tests** in total following
+strict coding style guidelines.
 
 ### 🎯 Tested Endpoints
 
@@ -32,12 +34,14 @@ The test suite covers **10 endpoints** with **63 tests** in total following stri
 ## 🚀 How to Run
 
 ### Run All Tests
+
 ```bash
 cd tests/
 python run_all_tests.py
 ```
 
 ### Run Specific Test
+
 ```bash
 cd tests/
 python test_main_page.py
@@ -46,6 +50,7 @@ python test_render.py
 ```
 
 ### Run with Unittest
+
 ```bash
 cd tests/
 python -m unittest test_render.TestRenderEndpoint.test_post_render_simple_json -v
@@ -56,17 +61,20 @@ python -m unittest test_render.TestRenderEndpoint.test_post_render_simple_json -
 Tests generate detailed logs in two formats:
 
 ### 📝 Text Log
+
 - **Location**: `tests/logs/test_results_YYYYMMDD_HHMMSS.log`
 - **Content**: Detailed output of each test, failures, errors
 - **Format**: Plain text, easy to read
 
 ### 📊 JSON Log
+
 - **Location**: `tests/logs/test_results_YYYYMMDD_HHMMSS.json`
 - **Content**: Structured data for programmatic analysis
 - **Format**: JSON with metrics, statistics, details
 
 ### Example Output
-```
+
+```text
 🚀 Starting test execution at 2025-08-08 11:35:52
 📋 Log files will be saved to:
    - Text log: tests/logs/test_results_20250808_113552.log
@@ -89,6 +97,7 @@ Tests generate detailed logs in two formats:
 ## 🏗️ Test Structure
 
 ### Base Class: `HTTPTestCase`
+
 - **File**: `test_utils.py`
 - **Functionality**:
   - HTTP server setup/teardown
@@ -97,7 +106,9 @@ Tests generate detailed logs in two formats:
   - Automatic cleanup of temporary files
 
 ### Test Pattern
+
 Each test file follows the coding style guidelines:
+
 ```python
 class TestEndpointName(HTTPTestCase):
   def test_basic_functionality(self):
@@ -114,6 +125,7 @@ class TestEndpointName(HTTPTestCase):
 ## 🎨 Coding Style Guidelines
 
 The test suite follows strict coding style guidelines:
+
 - ✅ **2 spaces indentation** (not 4 spaces)
 - ✅ **Descriptive names in English**
 - ✅ **No trailing whitespace**
@@ -123,13 +135,16 @@ The test suite follows strict coding style guidelines:
 ## 🔧 Test Configuration
 
 ### Test Server
+
 - **Host**: `127.0.0.1`
 - **Port**: `8000`
 - **Configuration**: Temporary, isolated from main environment
 - **Data**: Temporary directories for history and configurations
 
 ### Environment Variables
+
 Tests create an isolated environment with:
+
 - Temporary configuration in `/tmp/`
 - Temporary history
 - Temporary input files
@@ -138,18 +153,21 @@ Tests create an isolated environment with:
 ## 🧹 Cleanup and Maintenance
 
 ### Manual Cleanup
+
 ```bash
 cd tests/
 python cleanup_tests.py
 ```
 
 ### Automatic Cleanup
+
 - Temporary files are cleaned automatically after each test
 - Old logs can be manually removed from the `logs/` directory
 
 ## 📈 Coverage Metrics
 
 ### Current Coverage: **100%**
+
 - ✅ All endpoints tested
 - ✅ Success and error cases
 - ✅ Security validation
@@ -157,6 +175,7 @@ python cleanup_tests.py
 - ✅ Complete integration
 
 ### Test Types
+
 - **Functional**: 45 tests (61%)
 - **Validation**: 15 tests (20%)
 - **Security**: 8 tests (11%)
@@ -166,21 +185,24 @@ python cleanup_tests.py
 
 ### Common Issues
 
-**Error: "Address already in use"**
+#### Error: "Address already in use"
+
 ```bash
 # Wait a few seconds between executions or
 # Check if main server is running
 ps aux | grep python | grep 8000
 ```
 
-**Import Failure**
+#### Import Failure
+
 ```bash
 # Ensure you're in the correct directory
 cd tests/
 export PYTHONPATH=.
 ```
 
-**File Permissions**
+#### File Permissions
+
 ```bash
 # Ensure correct permissions
 chmod +x run_all_tests.py

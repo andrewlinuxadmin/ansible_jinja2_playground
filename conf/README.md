@@ -5,6 +5,7 @@ This directory contains configuration files for the Ansible Jinja2 Playground ap
 ## Files Overview
 
 ### ansible_jinja2_playground.conf
+
 Main configuration file containing application settings organized in sections:
 
 - **[server]**: Server configuration (host, port)
@@ -13,9 +14,12 @@ Main configuration file containing application settings organized in sections:
 - **[user]**: User interface preferences (theme, editor heights)
 
 ### ansible_jinja2_playground_history.json
-History storage file containing all user interactions in reverse chronological order (newest first).
+
+History storage file containing all user interactions in reverse chronological
+order (newest first).
 
 ### ansible_jinja2_playground_history_examples.json
+
 Example history entries for reference and testing purposes.
 
 ## Configuration File Format
@@ -48,11 +52,13 @@ To run the application on a different port:
 
 1. Edit `ansible_jinja2_playground.conf`
 2. Modify the `port` value in the `[server]` section:
+
    ```ini
    [server]
    host = 127.0.0.1
    port = 8080
    ```
+
 3. Restart the application: `python run.py`
 
 ### Other Server Settings
@@ -61,6 +67,7 @@ To run the application on a different port:
 - **port**: Server port number (default: 8000)
 
 ### History File Structure
+
 ```json
 [
   {
@@ -76,19 +83,23 @@ To run the application on a different port:
 ## Data Format Standards
 
 ### Loop Fields (Native Format)
+
 - **enable_loop**: Boolean value (`true`/`false`)
 - **loop_variable**: Plain text string
 
 ### Preserved Base64 Fields
+
 - **input**: User data (JSON/YAML) - base64 encoded for safety
 - **expr**: Jinja2 template content - base64 encoded for safety
 
 ### Timestamp Format
+
 ISO 8601 format: `YYYY-MM-DDTHH:MM:SS`
 
 ## File Permissions
 
 Recommended permissions for security:
+
 ```bash
 chmod 750 conf/
 chmod 640 conf/*.conf
@@ -98,6 +109,7 @@ chmod 644 conf/*.json
 ## Backup and Maintenance
 
 ### Regular Backups
+
 ```bash
 # Create timestamped backup
 cp conf/ansible_jinja2_playground_history.json \
@@ -105,9 +117,11 @@ cp conf/ansible_jinja2_playground_history.json \
 ```
 
 ### History Cleanup
+
 The application automatically manages history size based on `history_max_size` setting.
 
 Manual cleanup:
+
 ```bash
 # Keep only last 100 entries
 python -c "

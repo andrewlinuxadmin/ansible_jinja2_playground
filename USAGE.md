@@ -7,6 +7,7 @@ This document provides detailed instructions for using both the frontend interfa
 ### Getting Started
 
 1. **Start the Server**
+
    ```bash
    source /home/acarlos/Dropbox/RedHat/Ansible/venvs/python3.9-ansible2.14/bin/activate
    cd ansible_jinja2_playground
@@ -20,36 +21,43 @@ This document provides detailed instructions for using both the frontend interfa
 ### Interface Overview
 
 #### 📝 **Input Data Section**
+
 - **Format Selection**: Choose between JSON and YAML
 - **Data Entry**: Enter your test data in the left editor
 - **File Upload**: Use "Load File" button for local files
 - **Auto-Loading**: Select from "Load from Input Files" dropdown
 
 #### 🔧 **Template Section**
+
 - **Jinja2 Templates**: Write your templates in the middle editor
 - **Syntax Highlighting**: Automatic syntax highlighting
 - **Real-time Validation**: Immediate error feedback
 
 #### 📊 **Results Section**
+
 - **Output Format**: Select JSON, YAML, or Plain Text
 - **Real-time Rendering**: See results as you type
 - **Error Display**: Detailed error messages when issues occur
 
 #### 🔄 **Loop Controls**
+
 - **Enable Loop**: Checkbox to activate loop functionality
 - **Loop Variable**: Define custom variable name (e.g., "item", "server")
 - **Auto-processing**: Automatically applies loop logic to data
 
 #### 📚 **History Management**
+
 - **Auto-save**: All interactions saved automatically
 - **History Selection**: Dropdown with recent entries
 - **Reverse Order**: Newest entries appear first
 - **Auto-refresh**: History updates automatically
 
 #### 🧹 **History Cleanup**
+
 The project includes a dedicated script for cleaning duplicate history entries:
 
 **Basic Usage:**
+
 ```bash
 # Clean duplicates from history file
 python3 deduplicate_history.py
@@ -59,6 +67,7 @@ python3 deduplicate_history.py --dry-run
 ```
 
 **Advanced Options:**
+
 ```bash
 # Keep oldest duplicates instead of newest
 python3 deduplicate_history.py --keep oldest
@@ -74,6 +83,7 @@ python3 deduplicate_history.py path/to/history.json
 ```
 
 **Features:**
+
 - **Smart Detection**: Compares decoded base64 content for accurate duplicate identification
 - **Automatic Backup**: Creates timestamped backups before making changes
 - **Safe Operation**: Validates file structure and handles errors gracefully
@@ -81,6 +91,7 @@ python3 deduplicate_history.py path/to/history.json
 - **Detailed Reporting**: Shows exactly what was removed and what remains
 
 **Example Output:**
+
 ```
 🧹 History Deduplication Tool
 ========================================
@@ -100,6 +111,7 @@ python3 deduplicate_history.py path/to/history.json
 ```
 
 **When to Use:**
+
 - Regular maintenance to prevent history file bloat
 - Before sharing or backing up the project
 - When history dropdown becomes cluttered with duplicates
@@ -127,17 +139,20 @@ python scan_ansible_filters.py
 ### Scanner Features
 
 #### 🔍 **Discovery Capabilities**
+
 - Automatically discovers all Ansible filters and tests from installed version
 - Scans 9 Ansible modules: core, mathstuff, urls, urlsplit, encryption, files, uri
 - Identifies 100+ filters and tests across different categories
 
 #### 🧪 **Testing Features**
+
 - Tests each filter/test via HTTP endpoint
 - Generates test cases for common scenarios
 - Reports success/failure with detailed messages
 - Achieves 100% success rate on supported filters
 
 #### 📊 **Reporting**
+
 - Comprehensive text report with statistics
 - JSON output for automated processing
 - Compatibility rate calculations
@@ -183,6 +198,7 @@ python scan_ansible_filters.py --output my_scan_results.json
 ### Working with Data
 
 #### JSON Input Example
+
 ```json
 {
   "servers": [
@@ -194,6 +210,7 @@ python scan_ansible_filters.py --output my_scan_results.json
 ```
 
 #### YAML Input Example
+
 ```yaml
 servers:
   - name: web01
@@ -206,12 +223,14 @@ environment: production
 ### Template Examples
 
 #### Basic Template
+
 ```jinja2
 Environment: {{ environment }}
 Server Count: {{ servers | length }}
 ```
 
 #### With Ansible Filters
+
 ```jinja2
 {% for server in servers %}
 Server: {{ server.name | upper }}
@@ -220,9 +239,11 @@ IP: {{ server.ip | ipaddr('address') }}
 ```
 
 #### Using Loop Functionality
+
 1. Enable "Enable Loop" checkbox
 2. Set loop variable to "server"
 3. Template will process each server individually:
+
 ```jinja2
 Current Server: {{ server.name }}
 IP Address: {{ server.ip }}
@@ -231,12 +252,14 @@ IP Address: {{ server.ip }}
 ### File Management
 
 #### Input Files
+
 - Place files in the `inputs/` directory
 - Supported formats: JSON, YAML, TXT
 - Files appear in "Load from Input Files" dropdown
 - Auto-loading when selected (no "Load File" button needed)
 
 #### File Upload
+
 - Use "Load File" button for external files
 - Drag-and-drop supported
 - Automatic format detection
@@ -244,11 +267,13 @@ IP Address: {{ server.ip }}
 ### Theme and Settings
 
 #### Theme Selection
+
 - **Dark Theme**: Default, eye-friendly
 - **Light Theme**: Traditional light background
 - **Eclipse Theme**: Alternative dark theme
 
 #### Editor Configuration
+
 - **Height Adjustment**: Resize editor panels
 - **Auto-refresh Intervals**: Configure update frequency
 - **Font Size**: Adjustable text size
@@ -256,9 +281,11 @@ IP Address: {{ server.ip }}
 ## Backend API Usage
 
 ### Authentication
+
 No authentication required for local development.
 
 ### Base URL
+
 ```
 http://localhost:8000
 ```
@@ -266,6 +293,7 @@ http://localhost:8000
 ### Endpoints
 
 #### 1. Render Template
+
 ```http
 POST /render
 Content-Type: application/x-www-form-urlencoded
@@ -274,6 +302,7 @@ json={"name": "test"}&expr={{ name | upper }}&enable_loop=false&loop_variable=
 ```
 
 **Response:**
+
 ```json
 {
   "result": "TEST",
@@ -283,11 +312,13 @@ json={"name": "test"}&expr={{ name | upper }}&enable_loop=false&loop_variable=
 ```
 
 #### 2. Get History
+
 ```http
 GET /history
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -301,21 +332,25 @@ GET /history
 ```
 
 #### 3. Get Input Files
+
 ```http
 GET /input-files
 ```
 
 **Response:**
+
 ```json
 ["sample.json", "sample.yaml", "loop_example.json"]
 ```
 
 #### 4. Get File Content
+
 ```http
 GET /input-file-content?filename=sample.json
 ```
 
 **Response:**
+
 ```json
 {
   "users": ["alice", "bob"],
@@ -324,11 +359,13 @@ GET /input-file-content?filename=sample.json
 ```
 
 #### 5. Configuration Management
+
 ```http
 GET /settings?section=user
 ```
 
 **Response:**
+
 ```json
 {
   "theme": "dark",
@@ -339,6 +376,7 @@ GET /settings?section=user
 ```
 
 #### 6. Update Settings
+
 ```http
 POST /settings
 Content-Type: application/x-www-form-urlencoded
@@ -347,6 +385,7 @@ section=user&theme=light&height-inputcode=150
 ```
 
 #### 7. Clear History
+
 ```http
 POST /history/clear
 Content-Type: application/x-www-form-urlencoded
@@ -357,12 +396,14 @@ count=10
 ### Error Handling
 
 #### Common Error Codes
+
 - **400**: Bad Request (invalid parameters)
 - **403**: Forbidden (security violation)
 - **404**: Not Found (endpoint/file not found)
 - **500**: Internal Server Error
 
 #### Error Response Format
+
 ```json
 {
   "error": "Template syntax error",
@@ -374,11 +415,13 @@ count=10
 ### Security Considerations
 
 #### File Access
+
 - Input files must be within `inputs/` directory
 - Path traversal attacks prevented
 - Filename validation enforced
 
 #### Template Execution
+
 - Sandboxed Jinja2 environment
 - Limited access to system functions
 - Safe execution of user templates
@@ -388,6 +431,7 @@ count=10
 ### History Maintenance
 
 #### Automated Cleanup
+
 The `deduplicate_history.py` script can be integrated into maintenance workflows:
 
 ```bash
@@ -402,6 +446,7 @@ The `deduplicate_history.py` script can be integrated into maintenance workflows
 ```
 
 #### Manual Maintenance
+
 ```bash
 # Check for duplicates without changes
 python3 deduplicate_history.py --dry-run
@@ -416,6 +461,7 @@ python3 deduplicate_history.py --validate-only
 ### Custom Ansible Filters
 
 The playground includes these Ansible filter modules:
+
 - **Core Filters**: `default`, `map`, `select`, `reject`, etc.
 - **Math Filters**: `abs`, `round`, `random`, etc.
 - **URL Filters**: `urlsplit`, `urljoin`, etc.
@@ -423,6 +469,7 @@ The playground includes these Ansible filter modules:
 ### Loop Processing
 
 When loop is enabled:
+
 1. Input data is treated as an array
 2. Each item is processed individually
 3. Loop variable contains current item
@@ -431,6 +478,7 @@ When loop is enabled:
 ### Integration with External Tools
 
 #### curl Examples
+
 ```bash
 # Render a template
 curl -X POST http://localhost:8000/render \
@@ -449,6 +497,7 @@ python3 deduplicate_history.py --dry-run
 ```
 
 #### Python Integration
+
 ```python
 import requests
 
@@ -495,6 +544,7 @@ print(result['result'])
 ### Debug Mode
 
 Enable debug output by modifying the server:
+
 ```python
 import logging
 logging.basicConfig(level=logging.DEBUG)

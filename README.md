@@ -61,6 +61,7 @@ The Ansible Jinja2 Playground provides a comprehensive development environment f
 ## Quick Start
 
 ### Prerequisites
+
 - Python 3.9+
 - Virtual environment (recommended)
 - Modern web browser (Firefox, Chrome, Edge)
@@ -88,11 +89,7 @@ python run.py
 > 📚 **See [REQUIREMENTS.md](REQUIREMENTS.md) for detailed information about dependency management**
 
 ### Access
-```
 
-> 📚 **See [REQUIREMENTS.md](REQUIREMENTS.md) for detailed information about dependency management**
-
-### Access
 Open your browser and navigate to: `http://localhost:8000`
 
 ## Container Deployment
@@ -100,6 +97,7 @@ Open your browser and navigate to: `http://localhost:8000`
 ### Using Podman (Recommended)
 
 #### Quick Start with Helper Script
+
 ```bash
 # Build and run the container
 ./container.sh run
@@ -115,6 +113,7 @@ Open your browser and navigate to: `http://localhost:8000`
 ```
 
 #### Manual Podman Commands
+
 ```bash
 # Build the image
 podman build -t ansible-jinja2-playground:latest -f Containerfile .
@@ -128,10 +127,11 @@ podman run -d \
   ansible-jinja2-playground:latest
 
 # Access the application
-open http://localhost:8000
+<http://localhost:8000>
 ```
 
 #### Using Podman Compose
+
 ```bash
 # Start with compose
 podman-compose up -d
@@ -162,7 +162,7 @@ podman-compose logs -f
 
 ## Project Structure
 
-```
+```text
 ansible_jinja2_playground/
 ├── README.md              # Main project documentation
 ├── INSTALL.md             # Installation instructions
@@ -196,15 +196,19 @@ ansible_jinja2_playground/
 ## Utilities
 
 ### 🔍 Ansible Compatibility Scanner
+
 ```bash
 python scan_ansible_filters.py
 ```
+
 Comprehensive scanner for testing Ansible filter and test compatibility with automatic discovery and HTTP endpoint validation.
 
 ### 🧹 History Cleanup Tool
+
 ```bash
 python deduplicate_history.py
 ```
+
 Smart duplicate detection and removal tool for maintaining clean interaction history with base64 content comparison.
 
 ## Browser Compatibility

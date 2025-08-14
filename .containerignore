@@ -1,11 +1,5 @@
-# .containerignore for Ansible Jinja2 Playground
-# Exclude unnecessary files from container build context
-
-# Version control
 .git/
 .gitignore
-
-# Python cache and compiled files
 __pycache__/
 *.pyc
 *.pyo
@@ -14,20 +8,14 @@ __pycache__/
 *.so
 .coverage
 htmlcov/
-
-# Virtual environments (we create our own in container)
 venv/
 env/
 .venv/
-
-# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -35,45 +23,25 @@ env/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Documentation source files
 *.md.backup
 docs/
-
-# Test logs and cache files only (keep test source files)
 tests/logs/
 tests/__pycache__/
 tests/*.pyc
-
-# Backup files
 *.backup
 *.bak
 *.tmp
-
-# Log files
 *.log
 logs/
-
-# Container files (avoid recursive copying)
 Containerfile
 .containerignore
 docker-compose.yml
 compose.yml
-
-# Development tools
 Makefile
 tox.ini
 .tox/
-
-# CI/CD files
 .github/
 .gitlab-ci.yml
 .travis.yml
-
-# Configuration examples (keep only essential configs)
 conf/*.backup
 conf/*_examples.json
-
-# Large sample files (keep only essential samples)
-# inputs/large_*.json
-# inputs/test_*.yaml
