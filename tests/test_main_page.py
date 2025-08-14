@@ -4,7 +4,6 @@ Tests for the main page endpoint (GET /)
 """
 
 import unittest
-import json
 from test_utils import HTTPTestCase
 
 

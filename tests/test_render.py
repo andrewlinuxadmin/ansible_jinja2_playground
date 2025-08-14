@@ -5,7 +5,6 @@ Tests for POST /render endpoint
 
 import unittest
 import json
-import base64
 import os
 import sys
 
@@ -289,7 +288,7 @@ class TestRenderEndpoint(HTTPTestCase):
   def test_render_duplicate_prevention_different_entries(self):
     """Test that different render requests create separate history entries"""
     # Clear history first
-    response = self.make_request('/history/clear', 'POST', {'count': '1000'})
+    self.make_request('/history/clear', 'POST', {'count': '1000'})
 
     # First request
     response1 = self.make_request('/render', 'POST', {
@@ -326,7 +325,7 @@ class TestRenderEndpoint(HTTPTestCase):
   def test_render_duplicate_prevention_non_consecutive(self):
     """Test that non-consecutive duplicate requests are saved"""
     # Clear history first
-    response = self.make_request('/history/clear', 'POST', {'count': '1000'})
+    self.make_request('/history/clear', 'POST', {'count': '1000'})
 
     # First request
     test_data1 = {
@@ -368,7 +367,7 @@ class TestRenderEndpoint(HTTPTestCase):
   def test_render_duplicate_prevention_different_loop_settings(self):
     """Test that same data with different loop settings creates different entries"""
     # Clear history first
-    response = self.make_request('/history/clear', 'POST', {'count': '1000'})
+    self.make_request('/history/clear', 'POST', {'count': '1000'})
 
     # First request without loop
     response1 = self.make_request('/render', 'POST', {

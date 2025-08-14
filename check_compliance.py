@@ -4,7 +4,6 @@ Script to check compliance with .copilotrc rules
 """
 
 import os
-import re
 import yaml
 import sys
 

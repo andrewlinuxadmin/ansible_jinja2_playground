@@ -257,7 +257,7 @@ def main():
         with open(args.history_file, 'w', encoding='utf-8') as f:
             json.dump(deduplicated_history, f, indent=2, ensure_ascii=False)
 
-        print(f"\n✅ Successfully deduplicated history file")
+        print("\n✅ Successfully deduplicated history file")
         print(f"📊 Original entries: {len(history_data)}")
         print(f"📊 Final entries: {len(deduplicated_history)}")
         print(f"🗑️  Removed: {len(history_data) - len(deduplicated_history)} duplicates")

@@ -1,5 +1,4 @@
 import json
-import sys
 import os
 import configparser
 import datetime
@@ -147,7 +146,7 @@ else:
         config_updated = True
     except ValueError as e:
       print(f"SECURITY WARNING: {e}")
-      print(f"Resetting input directory to safe default: 'inputs'")
+      print("Resetting input directory to safe default: 'inputs'")
       config.set('input_files', 'directory', 'inputs')
       config_updated = True
 

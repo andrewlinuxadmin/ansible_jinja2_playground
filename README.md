@@ -66,6 +66,7 @@ The Ansible Jinja2 Playground provides a comprehensive development environment f
 - Modern web browser (Firefox, Chrome, Edge)
 
 ### Installation
+
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -74,12 +75,22 @@ cd ansible_jinja2_playground
 # Activate virtual environment
 source /home/acarlos/Dropbox/RedHat/Ansible/venvs/python3.9-ansible2.14/bin/activate
 
-# Install dependencies
-pip install -r pip-venv-requirements.txt
+# Install production dependencies
+pip install -r requirements.txt
+
+# (Optional) Install development tools
+pip install -r requirements-dev.txt
 
 # Start the server
 python run.py
 ```
+
+> 📚 **See [REQUIREMENTS.md](REQUIREMENTS.md) for detailed information about dependency management**
+
+### Access
+```
+
+> 📚 **See [REQUIREMENTS.md](REQUIREMENTS.md) for detailed information about dependency management**
 
 ### Access
 Open your browser and navigate to: `http://localhost:8000`

@@ -1,0 +1,19 @@
+# Development tools and testing dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Code quality and linting
+flake8>=7.0.0
+autopep8>=2.0.0
+ansible-lint>=6.0.0
+
+# Testing framework
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Development utilities
+black>=23.0.0
+isort>=5.0.0
+
+# Documentation
+sphinx>=5.0.0
+sphinx-rtd-theme>=1.0.0

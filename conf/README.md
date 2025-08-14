@@ -7,9 +7,10 @@ This directory contains configuration files for the Ansible Jinja2 Playground ap
 ### ansible_jinja2_playground.conf
 Main configuration file containing application settings organized in sections:
 
+- **[server]**: Server configuration (host, port)
+- **[history]**: History management settings
+- **[input_files]**: Input directory configuration
 - **[user]**: User interface preferences (theme, editor heights)
-- **[system]**: System-level settings (history limits, debug mode)
-- **[server]**: Server configuration (port, host, security settings)
 
 ### ansible_jinja2_playground_history.json
 History storage file containing all user interactions in reverse chronological order (newest first).
@@ -20,22 +21,44 @@ Example history entries for reference and testing purposes.
 ## Configuration File Format
 
 ### Settings Structure
+
 ```ini
+[server]
+host = 127.0.0.1
+port = 8000
+
+[history]
+max_entries = 1000
+
+[input_files]
+directory = inputs
+
 [user]
 theme = dark
 height-inputcode = 100
 height-jinjaexpr = 200
-height-resultview = 1000
-
-[system]
-history_max_size = 1000
-auto_save = true
-debug_mode = false
-
-[server]
-port = 8000
-host = localhost
+height-resultview = 800
 ```
+
+## Common Configuration Changes
+
+### Changing Server Port
+
+To run the application on a different port:
+
+1. Edit `ansible_jinja2_playground.conf`
+2. Modify the `port` value in the `[server]` section:
+   ```ini
+   [server]
+   host = 127.0.0.1
+   port = 8080
+   ```
+3. Restart the application: `python run.py`
+
+### Other Server Settings
+
+- **host**: Server bind address (default: 127.0.0.1 for localhost only)
+- **port**: Server port number (default: 8000)
 
 ### History File Structure
 ```json

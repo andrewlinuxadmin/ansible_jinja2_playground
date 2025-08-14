@@ -1,11 +1,8 @@
 import unittest
-import tempfile
 import json
 import os
-import base64
 import time
 import sys
-from unittest.mock import patch
 
 # Add the app directory to the path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'app'))

@@ -4,7 +4,6 @@ Tests for 404 endpoint (not found)
 """
 
 import unittest
-import json
 import os
 import sys
 

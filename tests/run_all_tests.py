@@ -29,7 +29,7 @@ def discover_and_run_tests():
     json_log_file = os.path.join(logs_dir, f'test_results_{timestamp}.json')
 
     print(f"🚀 Starting test execution at {datetime.datetime.now()}")
-    print(f"📋 Log files will be saved to:")
+    print("📋 Log files will be saved to:")
     print(f"   - Text log: {log_file}")
     print(f"   - JSON log: {json_log_file}")
     print("=" * 70)
@@ -162,7 +162,7 @@ def discover_and_run_tests():
         print("\n🎉 ALL TESTS PASSED! 🎉")
         exit_code = 0
     else:
-        print(f"\n⚠️  SOME TESTS FAILED OR HAD ERRORS")
+        print("\n⚠️  SOME TESTS FAILED OR HAD ERRORS")
         exit_code = 1
 
     # Generate text log
@@ -184,7 +184,7 @@ def discover_and_run_tests():
     with open(json_log_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
 
-    print(f"\n📝 Detailed logs saved to:")
+    print("\n📝 Detailed logs saved to:")
     print(f"   - {log_file}")
     print(f"   - {json_log_file}")
 

@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 .vscode
 .copilotrc
+.github
+.ansible
 **/ansible_jinja2_playground_history.json
 .lh/
 **/.lh/
