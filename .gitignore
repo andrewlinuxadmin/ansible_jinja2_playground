@@ -12,3 +12,13 @@ __pycache__/
 podman-dirs
 git.sh
 activate
+
+# Documentation files that should not be tracked
+*_ANALYSIS*.md
+*_REPORT*.md
+*_INSTRUCTIONS*.md
+GITHUB_RELEASE_*.md
+
+# Test logs (should be generated, not stored)
+tests/logs/*.log
+tests/logs/*.json
