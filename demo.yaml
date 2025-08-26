@@ -1,25 +1,31 @@
 ---
 - name: Enviar todas as variáveis do Ansible para o Jinja2 Playground
   hosts: localhost
-  gather_facts: yes
-
+  gather_facts: true
   vars:
-    # Suas variáveis personalizadas aqui
     app_name: "MyApp"
     app_version: "2.2.0"
     env_type: "production"
 
   tasks:
+    - name: Collect services using service_facts
+      ansible.builtin.service_facts: {}
+      register: services_collection_result
+
+    - name: Collect active TCP/UDP ports using community.general
+      community.general.listen_ports_facts: {}
+      register: ports_collection_result
+
     - name: Send Ansible variables to Jinja2 Playground
       ansible.builtin.uri:
         url: "http://127.0.0.1:8000/load_ansible_vars"
         method: POST
         body_format: json
         body:
-          variables_b64: "{{ hostvars[inventory_hostname] | to_json | b64encode }}"
+          variables_b64: "{{ vars | to_json | b64encode }}"
           summary:
-            total_variables: "{{ hostvars[inventory_hostname] | length }}"
-            module: "ansible.builtin.uri"
+            total_variables: "{{ vars | length }}"
+            my_test: "test_value"
             source: "all_variables"
             timestamp: "{{ ansible_date_time.iso8601 }}"
         headers:

@@ -475,7 +475,7 @@ class JinjaHandler(BaseHTTPRequestHandler):
       self.send_error(404, 'Endpoint not found')
       return
 
-    json_text = params.get('json', [''])[0]
+    json_text = params.get('input', [''])[0] or params.get('json', [''])[0]
     expr = params.get('expr', [''])[0]
 
     # Loop parameters
@@ -507,24 +507,50 @@ class JinjaHandler(BaseHTTPRequestHandler):
 
       # Handle loop simulation
       if enable_loop and loop_variable:
-        # Navigate to the loop variable in the data
-        loop_data = data
-        parts = loop_variable.split('.')
+        # Try to evaluate loop_variable as a Jinja2 expression first
+        try:
+          # If loop_variable contains Jinja2 expressions (filters, etc.), evaluate it
+          if '|' in loop_variable or '(' in loop_variable or '[' in loop_variable:
+            # Create context for evaluating the loop variable expression
+            # Include both individual variables and data object access
+            context = data.copy()
+            context['data'] = data
 
-        # Handle special case where first part is 'data' (refers to root)
-        if parts[0] == 'data':
-          # Skip 'data' prefix and start from the actual data
-          parts = parts[1:]
+            # Evaluate as Jinja2 expression
+            loop_template = env.from_string('{{ ' + loop_variable + ' }}')
+            loop_result = loop_template.render(**context)
 
-        # Navigate through the remaining path
-        for part in parts:
-          if isinstance(loop_data, dict) and part in loop_data:
-            loop_data = loop_data[part]
+            # Try to parse the result as Python literal (for lists, dicts, etc.)
+            try:
+              loop_data = ast.literal_eval(loop_result)
+            except (ValueError, SyntaxError):
+              # If literal_eval fails, try JSON parsing
+              try:
+                loop_data = json.loads(loop_result)
+              except json.JSONDecodeError:
+                raise ValueError(f"Loop variable expression '{loop_variable}' did not evaluate to a valid list/array")
           else:
-            raise ValueError(f"Loop variable '{part}' not found in input data")
+            # Navigate to the loop variable in the data (original behavior for simple paths)
+            loop_data = data
+            parts = loop_variable.split('.')
+
+            # Handle special case where first part is 'data' (refers to root)
+            if parts[0] == 'data':
+              # Skip 'data' prefix and start from the actual data
+              parts = parts[1:]
+
+            # Navigate through the remaining path
+            for part in parts:
+              if isinstance(loop_data, dict) and part in loop_data:
+                loop_data = loop_data[part]
+              else:
+                raise ValueError(f"Loop variable '{part}' not found in input data")
+
+        except Exception as e:
+          raise ValueError(f"Error evaluating loop variable '{loop_variable}': {str(e)}")
 
         if not isinstance(loop_data, list):
-          raise ValueError(f"Loop variable '{loop_variable}' must be an array/list")
+          raise ValueError(f"Loop variable '{loop_variable}' must evaluate to an array/list, got {type(loop_data).__name__}")
 
         # Process each item in the loop
         results = []

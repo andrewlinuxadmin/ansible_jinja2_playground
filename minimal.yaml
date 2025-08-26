@@ -16,9 +16,9 @@
         method: POST
         body_format: json
         body:
-          variables_b64: "{{ hostvars[inventory_hostname] | to_json | b64encode }}"
+          variables_b64: "{{ vars | to_json | b64encode }}"
           summary:
-            total_variables: "{{ hostvars[inventory_hostname] | length }}"
+            total_variables: "{{ vars | length }}"
             module: "ansible.builtin.uri"
             source: "all_variables"
             timestamp: "{{ ansible_date_time.iso8601 }}"

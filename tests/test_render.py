@@ -216,7 +216,7 @@ class TestRenderEndpoint(HTTPTestCase):
     })
 
     self.assertEqual(response['status_code'], 400)
-    self.assertIn('must be an array/list', response['content'])
+    self.assertIn('must evaluate to an array/list', response['content'])
 
   def test_post_render_loop_nested_variable_path(self):
     """Test POST /render with loop on nested variable path"""
@@ -287,6 +287,138 @@ class TestRenderEndpoint(HTTPTestCase):
     # Should return 400 because loop processing fails without proper variable
     self.assertEqual(response['status_code'], 400)
     self.assertIn("'item' is undefined", response['content'])
+
+  def test_post_render_loop_with_jinja_expression_keys(self):
+    """Test POST /render with loop using Jinja2 expression - services.keys() | list"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"services": {"web": "nginx", "api": "fastapi", "db": "postgres"}}',
+        'expr': 'Service: {{ item }}',
+        'enable_loop': 'true',
+        'loop_variable': 'services.keys() | list'
+    })
+
+    self.assertEqual(response['status_code'], 200)
+    self.assertEqual(response['headers'].get('X-Loop-Enabled'), 'true')
+
+    result = json.loads(response['content'])
+    self.assertIsInstance(result, list)
+    self.assertEqual(len(result), 3)
+    
+    # Should contain all service keys
+    service_names = [item.replace('Service: ', '') for item in result]
+    self.assertIn('web', service_names)
+    self.assertIn('api', service_names)
+    self.assertIn('db', service_names)
+
+  def test_post_render_loop_with_jinja_expression_values(self):
+    """Test POST /render with loop using Jinja2 expression - services.values() | list"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"services": {"web": "nginx", "api": "fastapi", "db": "postgres"}}',
+        'expr': 'Technology: {{ item }}',
+        'enable_loop': 'true',
+        'loop_variable': 'services.values() | list'
+    })
+
+    self.assertEqual(response['status_code'], 200)
+    self.assertEqual(response['headers'].get('X-Loop-Enabled'), 'true')
+
+    result = json.loads(response['content'])
+    self.assertIsInstance(result, list)
+    self.assertEqual(len(result), 3)
+    
+    # Should contain all service values
+    technologies = [item.replace('Technology: ', '') for item in result]
+    self.assertIn('nginx', technologies)
+    self.assertIn('fastapi', technologies)
+    self.assertIn('postgres', technologies)
+
+  def test_post_render_loop_with_jinja_expression_range(self):
+    """Test POST /render with loop using Jinja2 expression - range(5) | list"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"count": 5}',
+        'expr': 'Number: {{ item }}',
+        'enable_loop': 'true',
+        'loop_variable': 'range(5) | list'
+    })
+
+    self.assertEqual(response['status_code'], 200)
+    self.assertEqual(response['headers'].get('X-Loop-Enabled'), 'true')
+
+    result = json.loads(response['content'])
+    self.assertIsInstance(result, list)
+    self.assertEqual(len(result), 5)
+    
+    # Should contain numbers 0 through 4
+    for i in range(5):
+      self.assertEqual(result[i], f'Number: {i}')
+
+  def test_post_render_loop_with_jinja_expression_data_access(self):
+    """Test POST /render with loop using Jinja2 expression - data.services.keys() | list"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"services": {"web": "nginx", "api": "fastapi", "db": "postgres"}}',
+        'expr': 'Service via data: {{ item }}',
+        'enable_loop': 'true',
+        'loop_variable': 'data.services.keys() | list'
+    })
+
+    self.assertEqual(response['status_code'], 200)
+    self.assertEqual(response['headers'].get('X-Loop-Enabled'), 'true')
+
+    result = json.loads(response['content'])
+    self.assertIsInstance(result, list)
+    self.assertEqual(len(result), 3)
+    
+    # Should contain all service keys
+    service_names = [item.replace('Service via data: ', '') for item in result]
+    self.assertIn('web', service_names)
+    self.assertIn('api', service_names)
+    self.assertIn('db', service_names)
+
+  def test_post_render_loop_with_jinja_expression_complex_filter(self):
+    """Test POST /render with loop using complex Jinja2 expression with Ansible filters"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"users": [{"name": "Alice", "active": true}, {"name": "Bob", "active": false}, {"name": "Charlie", "active": true}]}',
+        'expr': 'Active user: {{ item.name }}',
+        'enable_loop': 'true',
+        'loop_variable': 'users | selectattr("active") | list'
+    })
+
+    self.assertEqual(response['status_code'], 200)
+    self.assertEqual(response['headers'].get('X-Loop-Enabled'), 'true')
+
+    result = json.loads(response['content'])
+    self.assertIsInstance(result, list)
+    self.assertEqual(len(result), 2)  # Only active users
+    
+    # Should contain only active users
+    active_users = [item.replace('Active user: ', '') for item in result]
+    self.assertIn('Alice', active_users)
+    self.assertIn('Charlie', active_users)
+    self.assertNotIn('Bob', active_users)
+
+  def test_post_render_loop_jinja_expression_invalid(self):
+    """Test POST /render with loop using invalid Jinja2 expression"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"services": {"web": "nginx"}}',
+        'expr': 'Service: {{ item }}',
+        'enable_loop': 'true',
+        'loop_variable': 'nonexistent.keys() | list'
+    })
+
+    self.assertEqual(response['status_code'], 400)
+    self.assertIn("Error evaluating loop variable", response['content'])
+
+  def test_post_render_loop_jinja_expression_non_list_result(self):
+    """Test POST /render with loop using Jinja2 expression that doesn't return a list"""
+    response = self.make_request('/render', method='POST', data={
+        'json': '{"services": {"web": "nginx"}}',
+        'expr': 'Service: {{ item }}',
+        'enable_loop': 'true',
+        'loop_variable': 'services | length'  # Returns int, not list
+    })
+
+    self.assertEqual(response['status_code'], 400)
+    self.assertIn("must evaluate to an array/list", response['content'])
 
   def test_post_render_with_custom_headers_validation(self):
     """Test POST /render validates all custom headers are present"""

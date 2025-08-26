@@ -13,6 +13,7 @@ __pycache__/
 podman-dirs
 git.sh
 activate
+**/*.tar.gz*
 
 # Documentation files that should not be tracked
 *_ANALYSIS*.md
