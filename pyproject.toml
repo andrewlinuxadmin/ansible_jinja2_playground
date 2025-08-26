@@ -27,7 +27,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ansible-jinja2-playground"
-version = "2.1.0"
+version = "2.2.0"
 description = "A web application for testing and validating Jinja2 templates with Ansible-core 2.14 compatibility"
 readme = "README.md"
 license = {file = "LICENSE"}

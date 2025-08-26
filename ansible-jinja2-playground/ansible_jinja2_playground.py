@@ -4,6 +4,8 @@ import configparser
 import datetime
 import base64
 import yaml
+import uuid
+import ast
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
@@ -19,33 +21,39 @@ from ansible.plugins.test.files import TestModule as FileTests
 from ansible.plugins.test.mathstuff import TestModule as MathTests
 from ansible.plugins.test.uri import TestModule as UriTests
 
-CURRENT_DIR = os.path.dirname(__file__)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
 SCRIPT_BASE = os.path.splitext(os.path.basename(__file__))[0]
 HTML_FILE_PATH = os.path.join(CURRENT_DIR, SCRIPT_BASE + '.html')
-CONF_PATH = os.path.join(PROJECT_ROOT, 'conf', SCRIPT_BASE + '.conf')
-JSON_HISTORY_PATH = os.path.join(PROJECT_ROOT, 'conf', SCRIPT_BASE + '_history.json')
+CONF_PATH = os.path.join(CURRENT_DIR, 'conf', SCRIPT_BASE + '.conf')
+JSON_HISTORY_PATH = os.path.join(CURRENT_DIR, 'conf', SCRIPT_BASE + '_history.json')
 
 # Load or create configuration
 config = configparser.ConfigParser()
 
 # Default configuration values
 default_config = {
-  'server': {
-    'host': '0.0.0.0',
-    'port': '8000'
-  },
-  'history': {'max_entries': '1000'},
-  'input_files': {
-    'directory': 'inputs'
-  },
-  'user': {
-    'theme': 'dark',
-    'height-inputcode': '100',
-    'height-jinjaexpr': '200',
-    'height-resultview': '1000'
-  }
+    'server': {
+        'host': '0.0.0.0',
+        'port': '8000'
+    },
+    'history': {'max_entries': '1000'},
+    'input_files': {
+        'directory': 'inputs',
+        'refresh_interval': '30'
+    },
+    'listener': {
+        'refresh_interval': '5'
+    },
+    'user': {
+        'theme': 'dark',
+        'height-inputcode': '100',
+        'height-jinjaexpr': '200',
+        'height-resultview': '1000',
+        'api-listener-enabled': 'false'
+    }
 }
+
 
 def entries_are_identical(entry1, entry2):
   """
@@ -63,6 +71,7 @@ def entries_are_identical(entry1, entry2):
       return False
 
   return True
+
 
 def validate_input_directory(directory):
   """
@@ -94,8 +103,8 @@ def validate_input_directory(directory):
 
   # Additional security checks for dangerous system directories
   dangerous_paths = [
-    '/etc', '/root', '/usr', '/var', '/bin', '/sbin', '/boot',
-    '/dev', '/proc', '/sys', '/tmp', '/opt', '/lib', '/lib64'
+      '/etc', '/root', '/usr', '/var', '/bin', '/sbin', '/boot',
+      '/dev', '/proc', '/sys', '/tmp', '/opt', '/lib', '/lib64'
   ]
 
   for dangerous in dangerous_paths:
@@ -111,6 +120,7 @@ def validate_input_directory(directory):
       pass
 
   return directory
+
 
 if not os.path.exists(CONF_PATH):
   # Create new configuration with default values
@@ -166,9 +176,9 @@ with open(HTML_FILE_PATH, 'r', encoding='utf-8') as f:
   HTML_PAGE = f.read()
 
 env = Environment(
-  trim_blocks=True,
-  lstrip_blocks=True,
-  undefined=StrictUndefined
+    trim_blocks=True,
+    lstrip_blocks=True,
+    undefined=StrictUndefined
 )
 env.filters.update(CoreFilters().filters())
 env.filters.update(MathFilters().filters())
@@ -342,6 +352,12 @@ class JinjaHandler(BaseHTTPRequestHandler):
     global MAX_ENTRIES
     parsed = urlparse(self.path)
     path = parsed.path
+
+    # Handle load_ansible_vars separately to avoid consuming the stream
+    if path == '/load_ansible_vars':
+      self.handle_load_ansible_vars()
+      return
+
     length = int(self.headers.get('Content-Length', 0))
     post_data = self.rfile.read(length)
     params = parse_qs(post_data.decode())
@@ -397,8 +413,8 @@ class JinjaHandler(BaseHTTPRequestHandler):
           except ValueError as e:
             self._send_headers(400, 'application/json')
             self.wfile.write(json.dumps({
-              'error': f'Security validation failed: {str(e)}',
-              'rejected_value': v[0]
+                'error': f'Security validation failed: {str(e)}',
+                'rejected_value': v[0]
             }).encode('utf-8'))
             return
         else:
@@ -416,6 +432,42 @@ class JinjaHandler(BaseHTTPRequestHandler):
           pass
       self._send_headers(200, 'application/json')
       self.wfile.write(json.dumps({section: dict(config[section])}, indent=2).encode('utf-8'))
+      return
+
+    if path == '/history/mark_read':
+      entry_id = params.get('id', [None])[0]
+      if not entry_id:
+        self._send_headers(400, 'application/json')
+        self.wfile.write(json.dumps({'error': 'Missing id parameter'}).encode('utf-8'))
+        return
+
+      try:
+        with open(JSON_HISTORY_PATH, 'r', encoding='utf-8') as f:
+          hist = json.load(f)
+      except Exception:
+        hist = []
+
+      # Find entry by ID and remove listener source
+      entry_found = False
+      for entry in hist:
+        if entry.get('id') == entry_id:
+          if entry.get('source') == 'listener':
+            entry['source'] = 'manual'  # Change to manual to indicate it was read
+          entry_found = True
+          break
+
+      if not entry_found:
+        self._send_headers(404, 'application/json')
+        self.wfile.write(json.dumps({'error': 'Entry not found'}).encode('utf-8'))
+        return
+
+      # Save updated history
+      os.makedirs(os.path.dirname(JSON_HISTORY_PATH), exist_ok=True)
+      with open(JSON_HISTORY_PATH, 'w', encoding='utf-8') as f:
+        json.dump(hist, f, indent=2)
+
+      self._send_headers(200, 'application/json')
+      self.wfile.write(json.dumps({'status': 'success', 'id': entry_id}).encode('utf-8'))
       return
 
     if path != '/render':
@@ -489,23 +541,41 @@ class JinjaHandler(BaseHTTPRequestHandler):
           try:
             parsed_iteration = json.loads(iteration_output)
             results.append(parsed_iteration)
-          except:
+          except BaseException:
             results.append(iteration_output)
 
         # Format final output as JSON array
         output = json.dumps(results, indent=2)
-        headers = {'X-Result-Type': 'json', 'X-Input-Format': input_format, 'X-Loop-Enabled': 'true'}
+        actual_type = type(results).__name__  # This will be 'list'
+        headers = {
+            'X-Result-Type': 'json',
+            'X-Input-Format': input_format,
+            'X-Loop-Enabled': 'true',
+            'X-Actual-Type': actual_type}
       else:
         # Normal processing without loop - provide access to both individual vars and data object
         context = data.copy()
         context['data'] = data
         output = template.render(**context)
+
+        # The actual type is always string for Jinja2 template output
+        # But we detect the content type for formatting purposes
+        actual_type = 'str'  # Jinja2 always returns strings
+
+        # Try to parse and format as JSON if possible, otherwise keep as string
         try:
           parsed_out = json.loads(output)
           output = json.dumps(parsed_out, indent=2)
-          headers = {'X-Result-Type': 'json', 'X-Input-Format': input_format}
-        except Exception:
-          headers = {'X-Result-Type': 'string', 'X-Input-Format': input_format}
+          headers = {'X-Result-Type': 'json', 'X-Input-Format': input_format, 'X-Actual-Type': actual_type}
+        except BaseException:
+          try:
+            # Try to safely evaluate as Python literal (dict, list, etc.)
+            python_obj = ast.literal_eval(output)
+            output = json.dumps(python_obj, indent=2)
+            headers = {'X-Result-Type': 'json', 'X-Input-Format': input_format, 'X-Actual-Type': actual_type}
+          except BaseException:
+            # If all parsing attempts fail, treat as string
+            headers = {'X-Result-Type': 'string', 'X-Input-Format': input_format, 'X-Actual-Type': actual_type}
 
       # Record - only save to history if input is not empty and not identical to previous entry
       try:
@@ -513,11 +583,11 @@ class JinjaHandler(BaseHTTPRequestHandler):
         if json_text.strip():
           ts = datetime.datetime.utcnow().isoformat() + 'Z'
           entry = {
-            'datetime': ts,
-            'input': base64.b64encode(json_text.encode('utf-8')).decode('ascii'),
-            'expr': base64.b64encode(expr.encode('utf-8')).decode('ascii'),
-            'enable_loop': enable_loop,
-            'loop_variable': loop_variable
+              'datetime': ts,
+              'input': base64.b64encode(json_text.encode('utf-8')).decode('ascii'),
+              'expr': base64.b64encode(expr.encode('utf-8')).decode('ascii'),
+              'enable_loop': enable_loop,
+              'loop_variable': loop_variable
           }
 
           # Load existing history
@@ -550,6 +620,91 @@ class JinjaHandler(BaseHTTPRequestHandler):
     except Exception as e:
       self._send_headers(400, 'text/plain')
       self.wfile.write(f'Jinja expression error: {e}'.encode())
+
+  def handle_load_ansible_vars(self):
+    """Handle loading variables from Ansible module."""
+    try:
+      if self.command != 'POST':
+        self.send_error(405, "Method not allowed")
+        return
+
+      # Check if API listener is enabled
+      listener_enabled = config.getboolean('user', 'api-listener-enabled', fallback=False)
+
+      if not listener_enabled:
+        # Listener is disabled - discard variables and return success without saving
+        response = {
+            'status': 'discarded',
+            'message': 'API Listener is disabled - variables discarded',
+            'variables_count': 0,
+            'listener_enabled': False
+        }
+        self._send_headers(200, 'application/json')
+        self.wfile.write(json.dumps(response, indent=2).encode())
+        return
+
+      content_length = int(self.headers['Content-Length'])
+      post_data = self.rfile.read(content_length)
+      data = json.loads(post_data.decode('utf-8'))
+
+      # Extract base64 encoded variables from module
+      variables_b64 = data.get('variables_b64', '')
+      summary = data.get('summary', {})
+
+      # Decode to verify it's valid
+      try:
+        variables_json = base64.b64decode(variables_b64).decode('utf-8')
+        variables = json.loads(variables_json)
+      except Exception as e:
+        raise ValueError(f"Invalid base64 variables data: {e}")
+
+      # Create history entry
+      entry = {
+          'id': str(uuid.uuid4()),
+          'datetime': datetime.datetime.now().isoformat() + 'Z',
+          'input': variables_b64,
+          'expr': base64.b64encode('{{ data }}'.encode()).decode(),
+          'enable_loop': False,
+          'loop_variable': '',
+          'source': 'listener',
+          'summary': summary
+      }
+
+      # Save to history
+      try:
+        with open(JSON_HISTORY_PATH, 'r', encoding='utf-8') as hf:
+          hist = json.load(hf)
+      except Exception:
+        hist = []
+
+      hist.append(entry)
+      hist = hist[-MAX_ENTRIES:]
+
+      os.makedirs(os.path.dirname(JSON_HISTORY_PATH), exist_ok=True)
+      with open(JSON_HISTORY_PATH, 'w', encoding='utf-8') as hf:
+        json.dump(hist, hf, indent=2)
+
+      # Return success response
+      response = {
+          'status': 'success',
+          'message': 'Variables loaded from Ansible module',
+          'variables_count': len(variables),
+          'summary': summary,
+          'entry_id': len(hist) - 1,
+          'listener_enabled': True
+      }
+
+      self._send_headers(200, 'application/json')
+      self.wfile.write(json.dumps(response, indent=2).encode())
+
+    except Exception as e:
+      self._send_headers(500, 'application/json')
+      error_response = {
+          'status': 'error',
+          'message': f'Error loading Ansible variables: {str(e)}'
+      }
+      self.wfile.write(json.dumps(error_response).encode())
+
 
 if __name__ == '__main__':
   print(f"Server started at http://{HOST}:{PORT}")

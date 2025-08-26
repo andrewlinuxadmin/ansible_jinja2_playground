@@ -1,12 +1,11 @@
+from test_utils import HTTPTestCase
 import unittest
 import json
 import os
 import sys
 
-# Add the app directory to the path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'app'))
-
-from test_utils import HTTPTestCase
+# Add the ansible-jinja2-playground directory to the path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'ansible-jinja2-playground'))
 
 
 class TestHistoryEndpoints(HTTPTestCase):
@@ -34,10 +33,10 @@ class TestHistoryEndpoints(HTTPTestCase):
 
     # Add some data
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
     self.assertEqual(response['status_code'], 200)
 
@@ -68,10 +67,10 @@ class TestHistoryEndpoints(HTTPTestCase):
 
     # Add data
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
 
     # Get size
@@ -93,16 +92,16 @@ class TestHistoryEndpoints(HTTPTestCase):
     """Test POST /history/clear without count parameter"""
     # Add some data first
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test1"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test1"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test2"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test2"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
 
     # Clear all
@@ -125,10 +124,10 @@ class TestHistoryEndpoints(HTTPTestCase):
     # Add multiple entries
     for i in range(5):
       response = self.make_request('/render', 'POST', {
-        'json': f'{{"name": "test{i}"}}',
-        'expr': '{{ name }}',
-        'enable_loop': 'false',
-        'loop_variable': ''
+          'json': f'{{"name": "test{i}"}}',
+          'expr': '{{ name }}',
+          'enable_loop': 'false',
+          'loop_variable': ''
       })
 
     # Clear only 2 entries
@@ -147,10 +146,10 @@ class TestHistoryEndpoints(HTTPTestCase):
     """Test POST /history/clear with invalid count"""
     # Add test data
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
 
     # Try to clear with invalid count
@@ -167,16 +166,16 @@ class TestHistoryEndpoints(HTTPTestCase):
 
     # Add 2 entries
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test1"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test1"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
     response = self.make_request('/render', 'POST', {
-      'json': '{"name": "test2"}',
-      'expr': '{{ name }}',
-      'enable_loop': 'false',
-      'loop_variable': ''
+        'json': '{"name": "test2"}',
+        'expr': '{{ name }}',
+        'enable_loop': 'false',
+        'loop_variable': ''
     })
 
     # Try to clear 10 entries (more than available)

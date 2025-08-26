@@ -1,0 +1,200 @@
+---
+# Demo Playbook: Server Audit with Ansible Jinja2 Playground
+# Este playbook demonstra como usar o Ansible Jinja2 Playground para
+# desenvolver templates complexos antes de implementá-los no playbook final.
+
+- name: Server Audit and Report Generation Demo
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    playground_url: "http://127.0.0.1:8000"
+    audit_timestamp: "{{ ansible_date_time.iso8601 }}"
+
+  tasks:
+    - name: "Step 1: Gather system services information"
+      ansible.builtin.service_facts:
+      register: services_info
+
+    - name: "Step 2: Get listening ports"
+      ansible.builtin.shell: |
+        ss -tlnp | grep LISTEN | awk '{print $4}' | cut -d: -f2 | sort -n | uniq
+      register: open_ports
+      changed_when: false
+
+    - name: "Step 3: Get running processes (top 10 by CPU)"
+      ansible.builtin.shell: |
+        ps aux --sort=-%cpu | head -11 | tail -10
+      register: top_processes
+      changed_when: false
+
+    - name: "Step 4: Get memory information"
+      ansible.builtin.shell: |
+        free -h | grep -E '^Mem|^Swap'
+      register: memory_info
+      changed_when: false
+
+    - name: "Step 5: Get disk usage"
+      ansible.builtin.shell: |
+        df -h | grep -vE '^Filesystem|tmpfs|cdrom'
+      register: disk_usage
+      changed_when: false
+
+    - name: "Step 6: Consolidate all gathered data"
+      ansible.builtin.set_fact:
+        server_audit_data:
+          hostname: "{{ ansible_hostname }}"
+          fqdn: "{{ ansible_fqdn }}"
+          os_family: "{{ ansible_os_family }}"
+          distribution: "{{ ansible_distribution }}"
+          distribution_version: "{{ ansible_distribution_version }}"
+          kernel: "{{ ansible_kernel }}"
+          architecture: "{{ ansible_architecture }}"
+          processor_count: "{{ ansible_processor_count }}"
+          processor_cores: "{{ ansible_processor_cores }}"
+          memtotal_mb: "{{ ansible_memtotal_mb }}"
+          timestamp: "{{ audit_timestamp }}"
+          uptime: "{{ ansible_uptime_seconds }}"
+          services:
+            total_count: "{{ services_info.ansible_facts.services | length }}"
+            running_services: "{{ services_info.ansible_facts.services | dict2items | selectattr('value.state', 'equalto', 'running') | list | length }}"
+            critical_services: "{{ services_info.ansible_facts.services | dict2items | selectattr('value.state', 'equalto', 'running') | selectattr('key', 'match', '.*(ssh|http|mysql|nginx|apache|docker).*') | map(attribute='key') | list }}"
+          network:
+            open_ports: "{{ open_ports.stdout_lines }}"
+            interfaces: "{{ ansible_interfaces }}"
+            default_ipv4: "{{ ansible_default_ipv4.address | default('N/A') }}"
+          processes:
+            top_cpu_processes: "{{ top_processes.stdout_lines }}"
+          memory:
+            info: "{{ memory_info.stdout_lines }}"
+          storage:
+            disk_usage: "{{ disk_usage.stdout_lines }}"
+
+    - name: "Step 7: 🚀 Send data to Ansible Jinja2 Playground for template development"
+      ansible.builtin.uri:
+        url: "{{ playground_url }}/load_ansible_vars"
+        method: POST
+        body_format: json
+        timeout: 30
+        status_code: [200, 201]
+        headers:
+          Content-Type: "application/json"
+        body:
+          input: "{{ server_audit_data | to_nice_json | b64encode }}"
+          source: "demo_server_audit"
+          description: "Server audit data for report template development"
+      register: playground_response
+
+    - name: "✅ Data sent to Ansible Jinja2 Playground successfully"
+      ansible.builtin.debug:
+        msg: |
+          🎯 Server audit data has been sent to the Ansible Jinja2 Playground!
+
+          📊 Summary of collected data:
+          - Hostname: {{ server_audit_data.hostname }}
+          - OS: {{ server_audit_data.distribution }} {{ server_audit_data.distribution_version }}
+          - Services running: {{ server_audit_data.services.running_services }}/{{ server_audit_data.services.total_count }}
+          - Open ports: {{ server_audit_data.network.open_ports | length }} ports
+          - Memory: {{ server_audit_data.memtotal_mb }}MB
+
+          🔧 Next Steps:
+          1. Open your browser at: {{ playground_url }}
+          2. Select the data from the "Load from History" dropdown
+          3. Develop your Jinja2 template for the audit report
+          4. Test different formatting options
+          5. Copy the final template back to your playbook
+
+          💡 Template Ideas to try:
+          - HTML report with tables
+          - Markdown summary
+          - JSON structured report
+          - Plain text executive summary
+
+    - name: "Step 8: 📋 Generate a basic report (placeholder for your Jinja2 template)"
+      ansible.builtin.debug:
+        msg: |
+          ==================== SERVER AUDIT REPORT ====================
+
+          🖥️  Server: {{ server_audit_data.hostname }} ({{ server_audit_data.fqdn }})
+          📅 Audit Date: {{ server_audit_data.timestamp }}
+
+          🔧 System Information:
+          - OS: {{ server_audit_data.distribution }} {{ server_audit_data.distribution_version }}
+          - Kernel: {{ server_audit_data.kernel }}
+          - Architecture: {{ server_audit_data.architecture }}
+          - CPU Cores: {{ server_audit_data.processor_cores }}
+          - Memory: {{ server_audit_data.memtotal_mb }}MB
+
+          🚀 Services Status:
+          - Total services: {{ server_audit_data.services.total_count }}
+          - Running services: {{ server_audit_data.services.running_services }}
+          - Critical services running: {{ server_audit_data.services.critical_services | join(', ') }}
+
+          🌐 Network:
+          - Primary IP: {{ server_audit_data.network.default_ipv4 }}
+          - Open ports: {{ server_audit_data.network.open_ports | join(', ') }}
+
+          💾 Storage:
+          {% for disk in server_audit_data.storage.disk_usage %}
+          - {{ disk }}
+          {% endfor %}
+
+          ⚠️  NOTE: This is a basic template. Use the Ansible Jinja2 Playground
+          to develop a more sophisticated report template!
+
+          =========================================================
+
+    - name: "🎓 Tutorial: How to use the Ansible Jinja2 Playground"
+      ansible.builtin.debug:
+        msg: |
+
+          📚 TUTORIAL: Using Ansible Jinja2 Playground for Report Development
+
+          🎯 What just happened:
+          All the server audit data was automatically sent to your Ansible Jinja2 Playground
+          where you can interactively develop and test Jinja2 templates.
+
+          🔄 Workflow:
+          1. Data Collection ✅ (Steps 1-6: Gathered all server information)
+          2. Data Transfer ✅ (Step 7: Sent to playground via API)
+          3. Template Development 🔧 (Your turn: Use the playground)
+          4. Template Integration 📝 (Copy final template back here)
+
+          💡 Try these advanced templates in the playground:
+
+          📊 HTML Table Report:
+          <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Hostname</td><td>{{ hostname }}</td></tr>
+            <tr><td>OS</td><td>{{ distribution }} {{ distribution_version }}</td></tr>
+            {% for port in network.open_ports %}
+            <tr><td>Port {{ port }}</td><td>LISTENING</td></tr>
+            {% endfor %}
+          </table>
+
+          📋 Markdown Report:
+          # Server Audit: {{ hostname }}
+
+          ## System Information
+          - **OS**: {{ distribution }} {{ distribution_version }}
+          - **Uptime**: {{ (uptime | int / 3600) | round(1) }} hours
+
+          ## Critical Services
+          {% for service in services.critical_services %}
+          - ✅ {{ service }}
+          {% endfor %}
+
+          🚨 Security Summary:
+          {% if network.open_ports | length > 10 %}
+          - ⚠️ High number of open ports ({{ network.open_ports | length }})
+          {% else %}
+          - ✅ Reasonable number of open ports ({{ network.open_ports | length }})
+          {% endif %}
+
+          🎨 Pro Tips:
+          - Use filters like | length, | join, | select, | reject
+          - Try conditional blocks with {% if %} statements
+          - Format numbers with | round, | int filters
+          - Create loops with {% for %} to iterate over lists
+          - Use | b64encode, | to_nice_json for data transformation
+
+          Happy templating! 🚀

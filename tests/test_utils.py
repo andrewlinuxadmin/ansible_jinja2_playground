@@ -16,10 +16,10 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
-# Add the app directory to the Python path
+# Add the ansible-jinja2-playground directory to the Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
-app_dir = os.path.join(project_root, 'app')
+app_dir = os.path.join(project_root, 'ansible-jinja2-playground')
 sys.path.insert(0, app_dir)
 
 # Import after path setup
@@ -80,7 +80,9 @@ height-resultview = 800
     ansible_jinja2_playground.config.read(cls.conf_file)
 
     # Update global variables
-    ansible_jinja2_playground.MAX_ENTRIES = int(ansible_jinja2_playground.config.get('history', 'max_entries', fallback='1000'))
+    ansible_jinja2_playground.MAX_ENTRIES = int(
+        ansible_jinja2_playground.config.get(
+            'history', 'max_entries', fallback='1000'))
     ansible_jinja2_playground.HOST = ansible_jinja2_playground.config.get('server', 'host', fallback='127.0.0.1')
     ansible_jinja2_playground.PORT = int(ansible_jinja2_playground.config.get('server', 'port', fallback='0'))
 
@@ -90,9 +92,9 @@ height-resultview = 800
     # JSON test file
     with open(os.path.join(cls.inputs_dir, 'test.json'), 'w', encoding='utf-8') as f:
       json.dump({
-        "name": "John Doe",
-        "age": 30,
-        "items": ["apple", "banana", "cherry"]
+          "name": "John Doe",
+          "age": 30,
+          "items": ["apple", "banana", "cherry"]
       }, f, indent=2)
 
     # YAML test file
@@ -178,21 +180,21 @@ class HTTPTestCase(BaseTestCase):
     try:
       with urllib.request.urlopen(req) as response:
         return {
-          'status_code': response.status,
-          'headers': dict(response.headers),
-          'content': response.read().decode('utf-8')
+            'status_code': response.status,
+            'headers': dict(response.headers),
+            'content': response.read().decode('utf-8')
         }
     except urllib.error.HTTPError as e:
       return {
-        'status_code': e.code,
-        'headers': dict(e.headers) if hasattr(e, 'headers') else {},
-        'content': e.read().decode('utf-8') if hasattr(e, 'read') else str(e)
+          'status_code': e.code,
+          'headers': dict(e.headers) if hasattr(e, 'headers') else {},
+          'content': e.read().decode('utf-8') if hasattr(e, 'read') else str(e)
       }
     except Exception as e:
       return {
-        'status_code': 0,
-        'headers': {},
-        'content': str(e)
+          'status_code': 0,
+          'headers': {},
+          'content': str(e)
       }
 
   def get_header(self, response, header_name):

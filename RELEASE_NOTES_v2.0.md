@@ -2,7 +2,8 @@
 
 ## 🚀 Major Release Features
 
-This v2.0 release represents a significant milestone with enhanced functionality, improved code quality, and professional development standards.
+This v2.0 release represents a significant milestone with enhanced functionality, improved code quality, and
+professional development standards.
 
 ### ✨ **New Features**
 
@@ -36,7 +37,8 @@ This v2.0 release represents a significant milestone with enhanced functionality
 
 ### 🛠 **Installation & Usage**
 
-Extract the archive and follow the INSTALL.md instructions for setup options including virtual environment, container, or direct execution.
+Extract the archive and follow the INSTALL.md instructions for setup options including virtual environment,
+container, or direct execution.
 
 ## Technical Specifications
 
@@ -111,6 +113,7 @@ Visit <http://localhost:5000> to access the application.
 
 ---
 
-**Full Changelog**: This release includes duplicate prevention, enhanced testing, professional coding standards, and comprehensive development environment setup.
+**Full Changelog**: This release includes duplicate prevention, enhanced testing, professional coding standards,
+and comprehensive development environment setup.
 
 For support and documentation, visit: <https://github.com/andrewlinuxadmin/ansible_jinja2_playground>

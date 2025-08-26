@@ -7,6 +7,7 @@ import os
 import yaml
 import sys
 
+
 def load_copilotrc():
   """Loads .copilotrc rules"""
   try:
@@ -15,6 +16,7 @@ def load_copilotrc():
   except Exception as e:
     print(f"❌ Error reading .copilotrc: {e}")
     return None
+
 
 def check_coding_style():
   """Checks if coding style is being followed"""
@@ -55,6 +57,7 @@ def check_coding_style():
 
   return len(issues) == 0
 
+
 def check_test_structure():
   """Checks if test structure is correct"""
   print("🧪 Checking test structure...")
@@ -75,6 +78,7 @@ def check_test_structure():
 
   return True
 
+
 def check_documentation():
   """Checks if documentation is present"""
   print("📚 Checking documentation...")
@@ -94,6 +98,7 @@ def check_documentation():
   else:
     print("   ✅ Complete documentation")
     return True
+
 
 def main():
   print("🔍 Checking compliance with .copilotrc")
@@ -124,6 +129,7 @@ def main():
     print("⚠️  SOME CHECKS FAILED")
     print("❌ Project needs adjustments for compliance")
     sys.exit(1)
+
 
 if __name__ == "__main__":
   main()

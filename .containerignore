@@ -43,5 +43,5 @@ tox.ini
 .github/
 .gitlab-ci.yml
 .travis.yml
-conf/*.backup
-conf/*_examples.json
+ansible-jinja2-playground/conf/*.backup
+ansible-jinja2-playground/conf/*_examples.json

@@ -1,569 +1,203 @@
 # Usage Guide - Ansible Jinja2 Playground
 
-This document provides detailed instructions for using both the frontend interface and backend API of the Ansible Jinja2 Playground.
+Interactive web-based tool for testing Jinja2 templates with full Ansible 2.14 compatibility.
 
-## Frontend Usage
+> **Note**: All configuration, templates, and data files are self-contained within the `ansible-jinja2-playground/`
+> directory structure.
 
-### Getting Started
+## Quick Start
 
-1. **Start the Server**
-
+1. **Start the server:**
    ```bash
-   source /home/acarlos/Dropbox/RedHat/Ansible/venvs/python3.9-ansible2.14/bin/activate
-   cd ansible_jinja2_playground
-   python run.py
+   python ansible-jinja2-playground/run.py
    ```
 
-2. **Access the Interface**
-   - Open Firefox (recommended) or Chrome
-   - Navigate to: `http://localhost:8000`
+2. **Open browser:** <http://localhost:8000>
 
-### Interface Overview
+3. **Test templates:** Enter Jinja2 template and data, click "Render"
 
-#### 📝 **Input Data Section**
+## Web Interface
 
-- **Format Selection**: Choose between JSON and YAML
-- **Data Entry**: Enter your test data in the left editor
-- **File Upload**: Use "Load File" button for local files
-- **Auto-Loading**: Select from "Load from Input Files" dropdown
+### Template Editor
+- **Template field:** Enter your Jinja2 template
+- **Data field:** Enter YAML/JSON test data
+- **Loop mode:** Enable to process array elements individually
+- **Render button:** Process template with data
 
-#### 🔧 **Template Section**
+### Features
+- **Auto-refresh:** History and input files update automatically
+- **Dark/Light themes:** Toggle in settings
+- **History browsing:** View and reuse previous templates
+- **Input file loading:** Load sample data files
+- **Error display:** Clear error messages for debugging
 
-- **Jinja2 Templates**: Write your templates in the middle editor
-- **Syntax Highlighting**: Automatic syntax highlighting
-- **Real-time Validation**: Immediate error feedback
+## Loop Functionality
 
-#### 📊 **Results Section**
+### Basic Loop
+Enable "Loop Mode" to process array data:
 
-- **Output Format**: Select JSON, YAML, or Plain Text
-- **Real-time Rendering**: See results as you type
-- **Error Display**: Detailed error messages when issues occur
-
-#### 🔄 **Loop Controls**
-
-- **Enable Loop**: Checkbox to activate loop functionality
-- **Loop Variable**: Define custom variable name (e.g., "item", "server")
-- **Auto-processing**: Automatically applies loop logic to data
-
-#### 📚 **History Management**
-
-- **Auto-save**: All interactions saved automatically
-- **History Selection**: Dropdown with recent entries
-- **Reverse Order**: Newest entries appear first
-- **Auto-refresh**: History updates automatically
-
-#### 🧹 **History Cleanup**
-
-The project includes a dedicated script for cleaning duplicate history entries:
-
-**Basic Usage:**
-
-```bash
-# Clean duplicates from history file
-python3 deduplicate_history.py
-
-# Preview changes without making modifications
-python3 deduplicate_history.py --dry-run
+**Template:**
+```jinja2
+Host: {{ item.name }}
+IP: {{ item.ip }}
 ```
 
-**Advanced Options:**
-
-```bash
-# Keep oldest duplicates instead of newest
-python3 deduplicate_history.py --keep oldest
-
-# Skip creating backup file
-python3 deduplicate_history.py --no-backup
-
-# Only validate file structure
-python3 deduplicate_history.py --validate-only
-
-# Clean specific history file
-python3 deduplicate_history.py path/to/history.json
-```
-
-**Features:**
-
-- **Smart Detection**: Compares decoded base64 content for accurate duplicate identification
-- **Automatic Backup**: Creates timestamped backups before making changes
-- **Safe Operation**: Validates file structure and handles errors gracefully
-- **Flexible Strategy**: Choose to keep newest or oldest duplicate entries
-- **Detailed Reporting**: Shows exactly what was removed and what remains
-
-**Example Output:**
-
-```
-🧹 History Deduplication Tool
-========================================
-📂 Target file: conf/ansible_jinja2_playground_history.json
-
-🔍 Validating 78 entries...
-✅ File structure is valid
-📊 Processing 78 history entries...
-🗑️  Removed 58 duplicate entries
-✅ Final history contains 20 unique entries
-📁 Backup created: conf/ansible_jinja2_playground_history.json.backup_20250808_120127
-
-✅ Successfully deduplicated history file
-📊 Original entries: 78
-📊 Final entries: 20
-🗑️  Removed: 58 duplicates
-```
-
-**When to Use:**
-
-- Regular maintenance to prevent history file bloat
-- Before sharing or backing up the project
-- When history dropdown becomes cluttered with duplicates
-- As part of automated cleanup workflows
-
-For complete documentation, see `HISTORY_CLEANUP.md`.
-
-## Ansible Compatibility Scanner *(NEW in v2.1)*
-
-The project includes a comprehensive scanner to test Ansible filter and test compatibility.
-
-### Quick Start
-
-```bash
-# Activate virtual environment
-source /home/acarlos/Dropbox/RedHat/Ansible/venvs/python3.9-ansible2.14/bin/activate
-
-# Start the playground server first
-python run.py &
-
-# Run compatibility scan
-python scan_ansible_filters.py
-```
-
-### Scanner Features
-
-#### 🔍 **Discovery Capabilities**
-
-- Automatically discovers all Ansible filters and tests from installed version
-- Scans 9 Ansible modules: core, mathstuff, urls, urlsplit, encryption, files, uri
-- Identifies 100+ filters and tests across different categories
-
-#### 🧪 **Testing Features**
-
-- Tests each filter/test via HTTP endpoint
-- Generates test cases for common scenarios
-- Reports success/failure with detailed messages
-- Achieves 100% success rate on supported filters
-
-#### 📊 **Reporting**
-
-- Comprehensive text report with statistics
-- JSON output for automated processing
-- Compatibility rate calculations
-- Module-by-module breakdown
-
-### Command Line Options
-
-```bash
-# Full scan with testing
-python scan_ansible_filters.py
-
-# Discovery only (no endpoint testing)
-python scan_ansible_filters.py --report-only
-
-# Custom server URL
-python scan_ansible_filters.py --url http://localhost:8080
-
-# Custom output file
-python scan_ansible_filters.py --output my_scan_results.json
-```
-
-### Sample Output
-
-```
-📊 RESUMO EXECUTIVO:
-├─ Versão do Ansible: 2.14.18
-├─ Total Descoberto: 115 (filtros + testes)
-├─ Total Testado: 47
-├─ Total Funcionando: 47
-├─ Taxa de Sucesso: 100.0%
-├─ Filtros Descobertos: 68
-└─ Testes Descobertos: 47
-```
-
-### When to Use Scanner
-
-1. **Version Upgrades**: Test compatibility after Ansible version changes
-2. **New Environment**: Verify filter availability in different environments
-3. **CI/CD Integration**: Automated compatibility validation
-4. **Development**: Discover available filters for development
-5. **Troubleshooting**: Identify filter/test availability issues
-
-### Working with Data
-
-#### JSON Input Example
-
-```json
-{
-  "servers": [
-    {"name": "web01", "ip": "192.168.1.10"},
-    {"name": "web02", "ip": "192.168.1.11"}
-  ],
-  "environment": "production"
-}
-```
-
-#### YAML Input Example
-
+**Data:**
 ```yaml
-servers:
-  - name: web01
-    ip: 192.168.1.10
-  - name: web02
-    ip: 192.168.1.11
-environment: production
+- name: web01
+  ip: 10.0.1.10
+- name: web02
+  ip: 10.0.1.11
 ```
 
-### Template Examples
+**Output:**
+```text
+Host: web01
+IP: 10.0.1.10
 
-#### Basic Template
-
-```jinja2
-Environment: {{ environment }}
-Server Count: {{ servers | length }}
+Host: web02
+IP: 10.0.1.11
 ```
 
-#### With Ansible Filters
+### Custom Loop Variable
+Change loop variable name in settings (default: `item`).
 
-```jinja2
-{% for server in servers %}
-Server: {{ server.name | upper }}
-IP: {{ server.ip | ipaddr('address') }}
-{% endfor %}
+## History Management
+
+### Automatic Deduplication
+- Prevents consecutive duplicate entries
+- Keeps history clean and relevant
+- Preserves unique templates and data combinations
+
+### Manual Cleanup
+```bash
+python ansible-jinja2-playground/deduplicate_history.py
 ```
 
-#### Using Loop Functionality
+## Ansible Filters & Tests
 
-1. Enable "Enable Loop" checkbox
-2. Set loop variable to "server"
-3. Template will process each server individually:
+### Available Filters (68 total)
+- **Text:** `upper`, `lower`, `regex_replace`, `split`
+- **Data:** `to_json`, `to_yaml`, `from_json`, `from_yaml`
+- **Lists:** `first`, `last`, `unique`, `flatten`
+- **Math:** `abs`, `round`, `max`, `min`
+- **Path:** `basename`, `dirname`, `expanduser`
+- **Network:** `ipaddr`, `network`, `netmask`
+- **Encoding:** `b64encode`, `b64decode`, `urlsplit`
 
-```jinja2
-Current Server: {{ server.name }}
-IP Address: {{ server.ip }}
+### Available Tests (47 total)
+- **Type:** `string`, `number`, `boolean`
+- **Comparison:** `equalto`, `greaterthan`, `lessthan`
+- **Pattern:** `match`, `search`, `regex`
+- **Network:** `ip`, `ipv4`, `ipv6`
+- **File:** `exists`, `directory`, `file`
+
+### Discovery Tool
+```bash
+python ansible-jinja2-playground/scan_ansible_filters.py
 ```
 
-### File Management
+## API Usage
 
-#### Input Files
-
-- Place files in the `inputs/` directory
-- Supported formats: JSON, YAML, TXT
-- Files appear in "Load from Input Files" dropdown
-- Auto-loading when selected (no "Load File" button needed)
-
-#### File Upload
-
-- Use "Load File" button for external files
-- Drag-and-drop supported
-- Automatic format detection
-
-### Theme and Settings
-
-#### Theme Selection
-
-- **Dark Theme**: Default, eye-friendly
-- **Light Theme**: Traditional light background
-- **Eclipse Theme**: Alternative dark theme
-
-#### Editor Configuration
-
-- **Height Adjustment**: Resize editor panels
-- **Auto-refresh Intervals**: Configure update frequency
-- **Font Size**: Adjustable text size
-
-## Backend API Usage
-
-### Authentication
-
-No authentication required for local development.
-
-### Base URL
-
-```
-http://localhost:8000
-```
-
-### Endpoints
-
-#### 1. Render Template
-
+### Render Endpoint
 ```http
 POST /render
 Content-Type: application/x-www-form-urlencoded
 
-json={"name": "test"}&expr={{ name | upper }}&enable_loop=false&loop_variable=
+input=SGVsbG8gV29ybGQ%3D&expr=SGVsbG8gV29ybGQ%3D&enable_loop=false
 ```
 
-**Response:**
+- **input:** Base64-encoded template
+- **expr:** Base64-encoded data
+- **enable_loop:** Boolean for loop mode
 
-```json
-{
-  "result": "TEST",
-  "success": true,
-  "input_format": "JSON"
-}
+### Other Endpoints
+- `GET /` - Main interface
+- `GET /history` - History data (JSON)
+- `GET /input-files` - Available input files
+- `GET /settings` - Configuration settings
+
+## Configuration
+
+### Server Settings
+Edit `ansible-jinja2-playground/conf/ansible_jinja2_playground.conf`:
+
+```ini
+[server]
+port = 8000
+host = 127.0.0.1
+
+[user]
+theme = dark
+editor_height = 300
 ```
 
-#### 2. Get History
-
-```http
-GET /history
-```
-
-**Response:**
-
-```json
-[
-  {
-    "input": "{\"name\": \"test\"}",
-    "expr": "{{ name | upper }}",
-    "enable_loop": false,
-    "loop_variable": "",
-    "timestamp": "2025-08-07T23:30:00"
-  }
-]
-```
-
-#### 3. Get Input Files
-
-```http
-GET /input-files
-```
-
-**Response:**
-
-```json
-["sample.json", "sample.yaml", "loop_example.json"]
-```
-
-#### 4. Get File Content
-
-```http
-GET /input-file-content?filename=sample.json
-```
-
-**Response:**
-
-```json
-{
-  "users": ["alice", "bob"],
-  "environment": "development"
-}
-```
-
-#### 5. Configuration Management
-
-```http
-GET /settings?section=user
-```
-
-**Response:**
-
-```json
-{
-  "theme": "dark",
-  "height-inputcode": "100",
-  "height-jinjaexpr": "200",
-  "height-resultview": "1000"
-}
-```
-
-#### 6. Update Settings
-
-```http
-POST /settings
-Content-Type: application/x-www-form-urlencoded
-
-section=user&theme=light&height-inputcode=150
-```
-
-#### 7. Clear History
-
-```http
-POST /history/clear
-Content-Type: application/x-www-form-urlencoded
-
-count=10
-```
-
-### Error Handling
-
-#### Common Error Codes
-
-- **400**: Bad Request (invalid parameters)
-- **403**: Forbidden (security violation)
-- **404**: Not Found (endpoint/file not found)
-- **500**: Internal Server Error
-
-#### Error Response Format
-
-```json
-{
-  "error": "Template syntax error",
-  "details": "Unexpected token at line 1",
-  "success": false
-}
-```
-
-### Security Considerations
-
-#### File Access
-
-- Input files must be within `inputs/` directory
-- Path traversal attacks prevented
-- Filename validation enforced
-
-#### Template Execution
-
-- Sandboxed Jinja2 environment
-- Limited access to system functions
-- Safe execution of user templates
-
-## Advanced Usage
-
-### History Maintenance
-
-#### Automated Cleanup
-
-The `deduplicate_history.py` script can be integrated into maintenance workflows:
-
-```bash
-# Weekly automated cleanup
-0 2 * * 0 /path/to/deduplicate_history.py
-
-# Before application startup with validation
-./deduplicate_history.py --dry-run && python run.py
-
-# Cleanup with custom retention strategy
-./deduplicate_history.py --keep oldest --no-backup
-```
-
-#### Manual Maintenance
-
-```bash
-# Check for duplicates without changes
-python3 deduplicate_history.py --dry-run
-
-# Clean duplicates and create backup
-python3 deduplicate_history.py
-
-# Validate history file structure only
-python3 deduplicate_history.py --validate-only
-```
-
-### Custom Ansible Filters
-
-The playground includes these Ansible filter modules:
-
-- **Core Filters**: `default`, `map`, `select`, `reject`, etc.
-- **Math Filters**: `abs`, `round`, `random`, etc.
-- **URL Filters**: `urlsplit`, `urljoin`, etc.
-
-### Loop Processing
-
-When loop is enabled:
-
-1. Input data is treated as an array
-2. Each item is processed individually
-3. Loop variable contains current item
-4. Results are concatenated
-
-### Integration with External Tools
-
-#### curl Examples
-
-```bash
-# Render a template
-curl -X POST http://localhost:8000/render \
-  -d "json={\"name\":\"world\"}" \
-  -d "expr=Hello {{ name }}!"
-
-# Get current settings
-curl http://localhost:8000/settings?section=user
-
-# Clear history (remove last 10 entries)
-curl -X POST http://localhost:8000/history/clear \
-  -d "count=10"
-
-# Check history file for maintenance
-python3 deduplicate_history.py --dry-run
-```
-
-#### Python Integration
-
-```python
-import requests
-
-# Render template
-response = requests.post('http://localhost:8000/render', data={
-    'json': '{"items": [1,2,3]}',
-    'expr': '{% for item in items %}{{ item }}{% endfor %}',
-    'enable_loop': 'false'
-})
-
-result = response.json()
-print(result['result'])
-```
+### Input Files
+Place sample data files in `inputs/` directory. Supported formats: JSON, YAML.
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Server Won't Start**
-   - Check virtual environment is activated
-   - Verify Python 3.9+ is installed
-   - Check port 8000 is available
+**Server won't start:**
+- Check if port is available
+- Verify Python virtual environment is activated
+- Ensure all dependencies are installed
 
-2. **Templates Not Rendering**
-   - Verify JSON/YAML syntax
-   - Check Jinja2 template syntax
-   - Review error messages in results panel
+**Template errors:**
+- Check Jinja2 syntax
+- Verify data format (YAML/JSON)
+- Review error messages in web interface
 
-3. **Files Not Loading**
-   - Ensure files are in `inputs/` directory
-   - Check file permissions
-   - Verify file format (JSON/YAML)
+**Missing filters:**
+- Ensure Ansible 2.14+ is installed
+- Check filter availability with scan tool
+- Verify filter name spelling
 
-4. **History Not Saving**
-   - Check `conf/` directory exists
-   - Verify write permissions
-   - Check disk space
-
-5. **History File Issues**
-   - Use `deduplicate_history.py --validate-only` to check file structure
-   - Run `deduplicate_history.py --dry-run` to identify duplicates
-   - Create backup before cleanup with `deduplicate_history.py`
-
-### Debug Mode
-
-Enable debug output by modifying the server:
-
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
+**Debug mode:**
+```bash
+export AJP_DEBUG=true
+python ansible-jinja2-playground/run.py
 ```
 
-### Performance Tips
+## Container Usage
 
-1. **Large Data Sets**
-   - Use smaller sample data for testing
-   - Consider loop functionality for repetitive data
+### Build and Run
+```bash
+podman build -t ansible-jinja2-playground .
+podman run -p 8000:8000 ansible-jinja2-playground
+```
 
-2. **Complex Templates**
-   - Break down into smaller parts
-   - Test incrementally
-   - Use history to track working versions
+### With Persistent Data
+```bash
+podman run -p 8000:8000 \
+  -v ./inputs:/home/playground/inputs:ro \
+  -v ./ansible-jinja2-playground/conf:/home/playground/ansible-jinja2-playground/conf \
+  ansible-jinja2-playground
+```
 
-3. **Browser Performance**
-   - Use Firefox for best compatibility
-   - Clear browser cache if issues occur
-   - Disable browser extensions that may interfere
+## Best Practices
 
-For additional help, refer to the project documentation or check the browser console for JavaScript errors.
+### Template Development
+1. **Start simple:** Test basic templates first
+2. **Use loop mode:** For array data processing
+3. **Check history:** Learn from previous templates
+4. **Test incrementally:** Add complexity gradually
+
+### Data Preparation
+1. **Valid format:** Ensure YAML/JSON is well-formed
+2. **Sample data:** Use representative test data
+3. **Edge cases:** Test with empty/null values
+4. **Array structure:** Consistent item format for loops
+
+### Performance
+1. **Limit data size:** Large datasets may slow rendering
+2. **Simple templates:** Complex logic may timeout
+3. **Browser limits:** Very large outputs may not display fully
+
+## Support
+
+- **Documentation:** Check other .md files in project root
+- **Issues:** Review error messages and logs
+- **Testing:** Use included test suite for validation
+- **Community:** GitHub repository for questions and contributions

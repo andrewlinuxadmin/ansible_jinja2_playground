@@ -1,243 +1,108 @@
 # Ansible Jinja2 Playground
 
-An interactive web application for testing and experimenting with Jinja2 templates using Ansible filters and loop functionality.
+Interactive web application for testing Jinja2 templates with 100+ Ansible filters and loop functionality.
 
-![Version](https://img.shields.io/badge/version-2.1-blue.svg)
+![Version](https://img.shields.io/badge/version-2.2-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.9+-green.svg)
 ![Ansible](https://img.shields.io/badge/ansible-2.14+-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## Overview
+## Features
 
-The Ansible Jinja2 Playground provides a comprehensive development environment for:
-
-- **Test Jinja2 templates** with real-time rendering
-- **Use 100+ Ansible filters** across 9 modules with full compatibility
-- **Simulate Ansible loops** with custom variables
-- **Load sample data** from JSON/YAML files
-- **Save and manage history** of your experiments
-- **Auto-refresh** input files and history
-- **Scan Ansible compatibility** with automated testing
-
-## Key Features
-
-### 🎯 **Template Processing**
-
-- Real-time Jinja2 template rendering
-- 100+ Ansible filters across 9 modules (core, math, URLs, encryption, etc.)
-- JSON and YAML input data formats
-- Syntax highlighting with multiple themes
-- Sandboxed environment for secure execution
-
-### 🔄 **Loop Simulation**
-
-- Ansible-style loop functionality
-- Custom loop variable names
-- Boolean-based loop controls
-- Integration with template rendering
-
-### 📁 **File Management**
-
-- Auto-loading from input files directory
-- Cross-browser compatible file uploads
-- Real-time file list updates
-- Security-validated file access
-
-### 📊 **History & Settings**
-
-- Persistent interaction history
-- Reverse chronological ordering
-- Configurable auto-refresh intervals
-- Theme and UI customization
-
-### 🔍 **Compatibility Scanner** *(NEW in v2.1)*
-
-- Automated Ansible filter and test discovery
-- Real-time compatibility testing via HTTP endpoints
-- Comprehensive compatibility reports (text and JSON)
-- Version-specific compatibility verification
-- 68 filters and 47 tests coverage across 9 Ansible modules
+- **🎯 Ansible Playbook Integration** - Receive variables directly from Ansible playbooks for easy debugging and
+  Jinja2 expression development
+- **Real-time template rendering** with Jinja2 and 100+ Ansible filters
+- **Loop simulation** for processing arrays with custom variables
+- **Web interface** with syntax highlighting and theme support
+- **History management** for saving and reusing templates
+- **Auto-refresh** for input files and settings
+- **Sandboxed execution** for secure template processing
 
 ## Quick Start
 
-### Prerequisites
-
-- Python 3.9+
-- Virtual environment (recommended)
-- Modern web browser (Firefox, Chrome, Edge)
-
-### Installation
+All project dependencies and configuration are self-contained within the `ansible-jinja2-playground` directory.
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# Clone and setup
+git clone https://github.com/andrewlinuxadmin/ansible_jinja2_playground.git
 cd ansible_jinja2_playground
 
-# Activate virtual environment
-source /home/acarlos/Dropbox/RedHat/Ansible/venvs/python3.9-ansible2.14/bin/activate
+# Activate virtual environment (required)
+# Use your preferred virtual environment method
 
-# Install production dependencies
-pip install -r requirements.txt
+# Install dependencies
+pip install -r ansible-jinja2-playground/requirements.txt
 
-# (Optional) Install development tools
-pip install -r requirements-dev.txt
-
-# Start the server
-python run.py
+# Start server
+python ansible-jinja2-playground/run.py
 ```
 
-> 📚 **See [REQUIREMENTS.md](REQUIREMENTS.md) for detailed information about dependency management**
-
-### Access
-
-Open your browser and navigate to: `http://localhost:8000`
+Access at: `http://localhost:8000`
 
 ## Container Deployment
 
-### Using Podman (Recommended)
-
-#### Quick Start with Helper Script
-
 ```bash
-# Build and run the container
-./container.sh run
+# Using Podman
+podman build -t ansible-jinja2-playground .
+podman run -p 8000:8000 \
+  -v $(pwd)/ansible-jinja2-playground/conf:$(pwd)/ansible-jinja2-playground/ansible-jinja2-playground/conf \
+  ansible-jinja2-playground
 
-# Check status
-./container.sh status
-
-# View logs
-./container.sh logs
-
-# Stop the container
-./container.sh stop
+# Using Compose
+podman-compose up --build
 ```
-
-#### Manual Podman Commands
-
-```bash
-# Build the image
-podman build -t ansible-jinja2-playground:latest -f Containerfile .
-
-# Run the container
-podman run -d \
-  --name ansible-jinja2-playground \
-  -p 8000:8000 \
-  -v "$(pwd)/conf:/home/playground/app/conf" \
-  -v "$(pwd)/inputs:/home/playground/app/inputs:ro" \
-  ansible-jinja2-playground:latest
-
-# Access the application
-<http://localhost:8000>
-```
-
-#### Using Podman Compose
-
-```bash
-# Start with compose
-podman-compose up -d
-
-# Stop with compose
-podman-compose down
-
-# View logs
-podman-compose logs -f
-```
-
-### Container Features
-
-- **Multi-stage build** for optimized image size
-- **Non-root user** execution for security
-- **Persistent volumes** for configuration and input files
-- **Health checks** for reliability
-- **Resource limits** for performance control
-- **Read-only filesystem** for enhanced security
-
-### Container Configuration
-
-- **Base Image**: Fedora 39
-- **Python Version**: 3.11
-- **User**: playground (UID 1000)
-- **Port**: 8000
-- **Volumes**: `conf/` (persistent), `inputs/` (read-only)
 
 ## Project Structure
 
 ```text
 ansible_jinja2_playground/
-├── README.md              # Main project documentation
-├── INSTALL.md             # Installation instructions
-├── USAGE.md               # Detailed usage guide
-├── LOOP_USAGE.md          # Loop functionality guide
-├── run.py                 # Server entry point
-├── app/                   # Main application
-│   ├── ansible_jinja2_playground.py    # Backend server
-│   └── ansible_jinja2_playground.html  # Frontend interface
-├── conf/                  # Configuration files
-│   ├── README.md          # Configuration documentation
-│   ├── *.conf             # Application settings
-│   └── *_history.json     # Interaction history
-├── inputs/                # Sample input files
-│   ├── README.md          # Input files documentation
-│   ├── sample.json        # Sample JSON data
-│   ├── sample.yaml        # Sample YAML data
-│   └── loop_example.json  # Loop demonstration data
-└── tests/                 # Test files
+├── ansible-jinja2-playground/                # Main application
+│   ├── run.py                                # Entry point
+│   ├── requirements.txt                      # Dependencies
+│   ├── requirements-dev.txt                  # Development dependencies
+│   ├── ansible_jinja2_playground.py         # Backend server
+│   ├── ansible_jinja2_playground.html       # Web interface
+│   ├── scan_ansible_filters.py              # Filter scanner
+│   ├── deduplicate_history.py               # History cleanup
+│   └── conf/                                 # Configuration files
+├── tests/                                    # Test suite
+└── *.md                                      # Documentation
 ```
-
-## Technology Stack
-
-- **Backend**: Python 3.9+ with HTTP server
-- **Template Engine**: Jinja2 with Ansible filters
-- **Frontend**: HTML5, Bootstrap 5, jQuery
-- **Editors**: CodeMirror with syntax highlighting
-- **Data Formats**: JSON, YAML support
-- **Security**: Path traversal protection, input validation
 
 ## Utilities
 
-### 🔍 Ansible Compatibility Scanner
-
+### Ansible Filter Scanner
 ```bash
-python scan_ansible_filters.py
+python ansible-jinja2-playground/scan_ansible_filters.py
 ```
 
-Comprehensive scanner for testing Ansible filter and test compatibility with automatic discovery and HTTP endpoint validation.
-
-### 🧹 History Cleanup Tool
-
+### History Cleanup
 ```bash
-python deduplicate_history.py
+python ansible-jinja2-playground/deduplicate_history.py
 ```
 
-Smart duplicate detection and removal tool for maintaining clean interaction history with base64 content comparison.
+### Test Suite
+```bash
+python tests/run_all_tests.py
+```
 
-## Browser Compatibility
+## Documentation
 
-- **Primary**: Firefox (fully tested)
-- **Secondary**: Chrome, Edge, Safari
-- **Features**: Cross-browser JavaScript compatibility
-- **Requirements**: Modern browser with ES5+ support
+- **[Installation Guide](INSTALL.md)** - Setup instructions
+- **[Usage Guide](USAGE.md)** - Web interface and API
+- **[Loop Guide](LOOP_USAGE.md)** - Array processing with loops
 
-## Contributing
+## Technology
 
-1. Follow the `.copilotrc` coding standards
-2. Use descriptive English variable names
-3. Maintain 2-space indentation
-4. Test on Firefox before submitting
-5. Activate virtual environment for Python work
+- **Backend**: Python 3.9+ HTTP server
+- **Frontend**: HTML5, Bootstrap 5, CodeMirror
+- **Templates**: Jinja2 with Ansible 2.14 compatibility
+- **Security**: Sandboxed environment with input validation
+
+## Browser Support
+
+Modern browsers with ES5+ support (Firefox, Chrome, Edge, Safari).
 
 ## License
 
 See [LICENSE](LICENSE) file for details.
-
-## Documentation
-
-- [Installation Guide](INSTALL.md)
-- [Usage Instructions](USAGE.md)
-- [Loop Functionality](LOOP_USAGE.md)
-- [Configuration Options](conf/README.md)
-- [Input Files Guide](inputs/README.md)
-
-## Version
-
-Current version: v1.2

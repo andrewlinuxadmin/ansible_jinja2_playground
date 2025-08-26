@@ -6,6 +6,7 @@ __pycache__/
 .copilotrc
 .github
 .ansible
+.markdownlint.yaml
 **/ansible_jinja2_playground_history.json
 .lh/
 **/.lh/
@@ -22,4 +23,3 @@ GITHUB_RELEASE_*.md
 # Test logs (should be generated, not stored)
 tests/logs/*.log
 tests/logs/*.json
-

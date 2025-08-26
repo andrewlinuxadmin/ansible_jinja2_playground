@@ -1,0 +1,51 @@
+# Git and development files
+.git/
+.gitignore
+*.md
+README*
+INSTALL*
+USAGE*
+LOOP_USAGE*
+RELEASE_NOTES*
+TODO*
+git.sh
+
+# Development and test artifacts
+# tests/ - NEEDED for container build validation, removed after tests pass
+tests/logs/
+tests/__pycache__/
+**/__pycache__/
+**/*.pyc
+*.log
+
+# Configuration backups and examples
+**/conf/*backup*
+**/conf/*example*
+
+# Development tools
+.copilotrc
+.markdownlint*
+pyproject.toml
+requirements-dev.txt
+
+# Container and compose files (not needed inside container)
+Containerfile
+compose.yaml
+.dockerignore
+
+# Temporary and cache files
+.cache/
+tmp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db

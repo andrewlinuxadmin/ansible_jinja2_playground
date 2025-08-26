@@ -3,13 +3,13 @@
 Tests for 404 endpoint (not found)
 """
 
+from test_utils import HTTPTestCase
 import unittest
 import os
 import sys
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(__file__))
-from test_utils import HTTPTestCase
 
 
 class Test404Endpoint(HTTPTestCase):
@@ -24,7 +24,7 @@ class Test404Endpoint(HTTPTestCase):
   def test_post_invalid_endpoint(self):
     """Test POST request to invalid endpoint returns 404"""
     response = self.make_request('/invalid-endpoint', method='POST', data={
-      'test': 'data'
+        'test': 'data'
     })
 
     self.assertEqual(response['status_code'], 404)

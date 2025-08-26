@@ -1,7 +1,6 @@
 - TODO:
   - Codemirror:
     - Não possui opção de find/replace
-    - Incluir opção de usar tab ou espaços para indentar
   - Projetos:
     - Incluir opção de criar/recuperar/salvar/deletar/renomear projeto
     - Histórico por projeto, caso exista

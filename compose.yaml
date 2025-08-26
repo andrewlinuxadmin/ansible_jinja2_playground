@@ -1,7 +1,7 @@
 # Podman Compose file for Ansible Jinja2 Playground
 # Usage: podman-compose up -d
 
-version: '3.8'
+version: "3.8"
 
 services:
   ansible-jinja2-playground:
@@ -20,11 +20,10 @@ services:
       - ANSIBLE_LOCAL_TEMP=/tmp/.ansible/tmp
       - ANSIBLE_REMOTE_TEMP=/tmp/.ansible/tmp
 
-    # Volume mounts using podman-dirs
+    # Volume mounts - using current project structure
     volumes:
-      # Map podman-dirs subdirectories to container paths
-      - ./podman-dirs/conf:/home/playground/app/conf
-      - ./podman-dirs/inputs:/home/playground/app/inputs:ro
+      # Map project configuration to container (persistent)
+      - ./ansible-jinja2-playground/conf:/home/playground/ansible-jinja2-playground/ansible-jinja2-playground/conf
 
     # Restart policy
     restart: unless-stopped
@@ -37,6 +36,3 @@ services:
       - /tmp
       - /home/playground/.cache
       - /opt/app-root/src/.ansible
-
-
-

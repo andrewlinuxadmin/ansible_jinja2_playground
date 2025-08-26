@@ -1,536 +1,229 @@
-# Installation Guide - Ansible Jinja2 Playground v2.1
+# Installation Guide - Ansible Jinja2 Playground
 
-This guide provides step-by-step instructions for setting up the Ansible Jinja2 Playground on your system.
+Quick installation guide for the Ansible Jinja2 Playground - an interactive web application for testing Jinja2
+templates with Ansible compatibility.
 
 ## Prerequisites
 
-### System Requirements
+- **Python 3.8+** (3.9+ recommended)
+- **Git** for repository cloning
+- **Virtual environment** (venv or conda)
 
-- **Operating System**: Linux (Ubuntu/Debian, CentOS/RHEL, Fedora), macOS, or Windows WSL2
-- **Python**: Version 3.9 or higher
-- **Ansible**: Version 2.14+ (for full compatibility)
-- **Memory**: Minimum 512MB RAM
-- **Storage**: 150MB free disk space
-- **Network**: Internet connection for package downloads
+## Quick Start
 
-### Required Software
+### Local Installation
 
-- Python 3.9+
-- pip (Python package manager)
-- virtualenv or venv
-- git (for cloning repository)
-- Ansible 2.14+ (automatically installed with requirements)
-
-## Installation Methods
-
-### Method 1: Container Deployment (Recommended)
-
-#### Prerequisites
-
-- **Podman** or **Docker** installed
-- **Git** for cloning repository
-- **curl** (for health checks)
-
-#### Quick Container Setup
+All project dependencies and configuration are self-contained within the `ansible-jinja2-playground` directory.
 
 ```bash
-# Clone repository
-git clone <repository-url>
+# 1. Clone repository
+git clone https://github.com/andrewlinuxadmin/ansible_jinja2_playground.git
 cd ansible_jinja2_playground
 
-# Option A: Using helper script (recommended)
-./container.sh run
+# Everything you need is inside ansible-jinja2-playground/
+# 2. Activate virtual environment (required)
+# Create and activate your preferred virtual environment
 
-# Option B: Using Podman directly
-podman build -t ansible-jinja2-playground -f Containerfile .
-podman run -d --name playground -p 8000:8000 \
-  -v "$(pwd)/conf:/home/playground/app/conf" \
-  -v "$(pwd)/inputs:/home/playground/app/inputs:ro" \
-  ansible-jinja2-playground
+# 3. Install dependencies
+pip install -r ansible-jinja2-playground/requirements.txt
 
-# Option C: Using Podman Compose
-podman-compose up -d
+# 4. Run application
+python ansible-jinja2-playground/run.py
 ```
 
-#### Container Benefits
+Access at: `http://localhost:8000`
 
-- **Isolated Environment**: No system dependency conflicts
-- **Consistent Setup**: Works across different operating systems
-- **Easy Deployment**: Single command installation
-- **Security**: Non-root execution and read-only filesystem
-- **Persistence**: Configuration and data preserved in volumes
+### Container Installation
 
-### Method 2: Virtual Environment Setup (Traditional)
-
-#### 1. Clone the Repository
+All project files are self-contained - the container includes everything needed to run the playground.
 
 ```bash
-git clone <repository-url>
+# Using Podman
+git clone https://github.com/andrewlinuxadmin/ansible_jinja2_playground.git
 cd ansible_jinja2_playground
-```
+podman build -t ansible-jinja2-playground .
+podman run -p 8000:8000 ansible-jinja2-playground
 
-#### 2. Create Virtual Environment
-
-```bash
-# Using venv (Python 3.9+)
-python3.9 -m venv /path/to/venvs/python3.9-ansible2.14
-
-# Or using virtualenv
-virtualenv -p python3.9 /path/to/venvs/python3.9-ansible2.14
-```
-
-#### 3. Activate Virtual Environment
-
-```bash
-# Linux/macOS
-source /path/to/venvs/python3.9-ansible2.14/bin/activate
-
-# Windows (if using WSL2)
-source /path/to/venvs/python3.9-ansible2.14/bin/activate
-```
-
-#### 4. Install Dependencies
-
-```bash
-pip install -r pip-venv-requirements.txt
-```
-
-#### 5. Verify Installation
-
-```bash
-python run.py --version
-```
-
-#### 6. Test New Features (v2.1)
-
-Test the Ansible compatibility scanner:
-
-```bash
-# Start the server in background
-python run.py &
-
-# Run compatibility scan
-python scan_ansible_filters.py --report-only
-
-# Kill background server
-pkill -f "python run.py"
-```
-
-Test the history cleanup utility:
-
-```bash
-# Check for duplicate entries
-python deduplicate_history.py --dry-run
-
-# View help for all options
-python deduplicate_history.py --help
-```
-
-### Method 2: System-wide Installation
-
-⚠️ **Warning**: System-wide installation is not recommended as it may cause conflicts with other Python projects.
-
-```bash
-# Install dependencies globally
-pip3 install -r pip-venv-requirements.txt
-
-# Run the application
-python3 run.py
-```
-
-## Dependencies
-
-### Core Dependencies
-
-The `pip-venv-requirements.txt` file contains all required packages:
-
-```
-ansible>=2.14.0,<3.0.0
-jinja2>=3.1.0
-pyyaml>=6.0
-markupsafe>=2.1.0
-```
-
-### Optional Dependencies
-
-For development and testing:
-
-```bash
-pip install pytest>=7.0.0
-pip install black>=22.0.0
-pip install flake8>=4.0.0
+# Using Docker Compose
+podman-compose up --build
 ```
 
 ## Configuration
 
-### 1. Environment Setup
+### Basic Settings
 
-Create the necessary directory structure:
+Configuration file: `ansible-jinja2-playground/conf/ansible_jinja2_playground.conf`
 
-```bash
-mkdir -p conf inputs
+```ini
+[server]
+host = 0.0.0.0
+port = 8000
+
+[user]
+theme = dark
+loop_variable_name = item
 ```
 
-### 2. Configuration Files
-
-The application will create default configuration files on first run:
-
-- `conf/ansible_jinja2_playground.conf` - Main configuration
-- `conf/ansible_jinja2_playground_history.json` - History storage
-
-### 3. Input Directory
-
-Place your test files in the `inputs/` directory:
+### Environment Variables
 
 ```bash
-# Example input files
-cp examples/*.json inputs/
-cp examples/*.yaml inputs/
+export AJP_PORT=8080
+export AJP_DEBUG=true
+python run.py
 ```
 
-### 4. Permissions
+## Directory Structure
 
-Ensure proper file permissions:
+After installation, everything is self-contained within the project directory:
+
+```text
+ansible_jinja2_playground/
+├── ansible-jinja2-playground/    # Main application (all code and config)
+│   ├── run.py                    # Entry point
+│   ├── requirements.txt          # Dependencies
+│   ├── requirements-dev.txt      # Development dependencies
+│   ├── ansible_jinja2_playground.py
+│   ├── conf/                     # Configuration files
+│   └── ...
+├── tests/                        # Test suite
+└── *.md                          # Documentation
+```
+
+## Development Setup
 
 ```bash
-chmod 755 run.py
-chmod 644 conf/*
-chmod 644 inputs/*
+# Install development dependencies
+pip install -r ansible-jinja2-playground/requirements-dev.txt
+
+# Run tests
+python tests/run_all_tests.py
+
+# Check compliance
+python check_compliance.py
 ```
-
-## Platform-Specific Instructions
-
-### Ubuntu/Debian
-
-#### Install Prerequisites
-
-```bash
-sudo apt update
-sudo apt install python3.9 python3.9-venv python3-pip git
-```
-
-#### Create Virtual Environment
-
-```bash
-python3.9 -m venv ~/venvs/python3.9-ansible2.14
-source ~/venvs/python3.9-ansible2.14/bin/activate
-```
-
-### CentOS/RHEL 8+
-
-#### Install Prerequisites
-
-```bash
-sudo dnf install python39 python39-pip git
-```
-
-#### Create Virtual Environment
-
-```bash
-python3.9 -m venv ~/venvs/python3.9-ansible2.14
-source ~/venvs/python3.9-ansible2.14/bin/activate
-```
-
-### Fedora
-
-#### Install Prerequisites
-
-```bash
-sudo dnf install python3 python3-pip git python3-virtualenv
-```
-
-#### Create Virtual Environment
-
-```bash
-python3 -m venv ~/venvs/python3.9-ansible2.14
-source ~/venvs/python3.9-ansible2.14/bin/activate
-```
-
-### macOS
-
-#### Install Prerequisites (using Homebrew)
-
-```bash
-brew install python@3.9 git
-```
-
-#### Create Virtual Environment
-
-```bash
-python3.9 -m venv ~/venvs/python3.9-ansible2.14
-source ~/venvs/python3.9-ansible2.14/bin/activate
-```
-
-### Windows (WSL2)
-
-#### Install WSL2 and Ubuntu
-
-1. Enable WSL2 in Windows Features
-2. Install Ubuntu from Microsoft Store
-3. Follow Ubuntu instructions above
 
 ## Verification
 
-### 1. Test Server Startup
+### Test Installation
 
 ```bash
-# Activate virtual environment
-source /path/to/venvs/python3.9-ansible2.14/bin/activate
+# Health check
+curl http://localhost:8000/
 
-# Start the server
-python run.py
-
-# Expected output:
-# Starting server on http://localhost:8000
-# Press Ctrl+C to stop
-```
-
-### 2. Test Frontend Access
-
-- Open browser to `http://localhost:8000`
-- Verify interface loads correctly
-- Test basic template rendering
-
-### 3. Test Backend API
-
-```bash
-# Test render endpoint
+# Test rendering
 curl -X POST http://localhost:8000/render \
-  -d "json={\"name\":\"test\"}" \
-  -d "expr=Hello {{ name }}!"
-
-# Expected response:
-# {"result":"Hello test!","success":true,"input_format":"JSON"}
+  -d "input=$(echo 'Hello {{ name }}' | base64)" \
+  -d "expr=$(echo 'name: World' | base64)"
 ```
+
+### Feature Verification
+
+1. **Web Interface**: Access `http://localhost:8000`
+2. **Template Rendering**: Test with simple templates
+3. **Loop Mode**: Enable loop with array data
+4. **Input Files**: Place files in `inputs/` directory
+5. **History**: Verify template history persistence
 
 ## Troubleshooting
 
-### Common Installation Issues
+### Common Issues
 
-#### 1. Python Version Conflicts
-
+**Port in use:**
 ```bash
-# Check Python version
-python --version
-python3 --version
-python3.9 --version
-
-# Use specific version
-python3.9 -m venv venv_name
-```
-
-#### 2. Permission Errors
-
-```bash
-# Fix file permissions
-chmod +x run.py
-sudo chown -R $USER:$USER .
-```
-
-#### 3. Virtual Environment Issues
-
-```bash
-# Remove and recreate virtual environment
-rm -rf /path/to/venvs/python3.9-ansible2.14
-python3.9 -m venv /path/to/venvs/python3.9-ansible2.14
-```
-
-#### 4. Package Installation Failures
-
-```bash
-# Upgrade pip
-pip install --upgrade pip
-
-# Clear pip cache
-pip cache purge
-
-# Install with verbose output
-pip install -v -r pip-venv-requirements.txt
-```
-
-#### 5. Port Already in Use
-
-```bash
-# Check what's using port 8000
 lsof -i :8000
-netstat -tulpn | grep 8000
-
-# Kill process using port
-sudo kill -9 <PID>
-
-# Or use different port
-python run.py --port 8080
+export AJP_PORT=8080
+python ansible-jinja2-playground/run.py
 ```
 
-### Network Issues
-
-#### Firewall Configuration
-
+**Import errors:**
 ```bash
-# Ubuntu/Debian
-sudo ufw allow 8000
-
-# CentOS/RHEL
-sudo firewall-cmd --add-port=8000/tcp --permanent
-sudo firewall-cmd --reload
+# Verify virtual environment
+which python
+pip install --force-reinstall -r ansible-jinja2-playground/requirements.txt
 ```
 
-#### Proxy Settings
-
+**Permission errors:**
 ```bash
-# Set proxy for pip
-pip install --proxy http://proxy.example.com:8080 -r pip-venv-requirements.txt
-
-# Set environment variables
-export HTTP_PROXY=http://proxy.example.com:8080
-export HTTPS_PROXY=http://proxy.example.com:8080
+chmod +x run.py
+chmod -R 755 ansible-jinja2-playground/conf/
 ```
 
-### Container Issues
-
-#### 1. Container Build Failures
+### Debug Mode
 
 ```bash
-# Check Podman/Docker installation
-podman --version
-
-# Clear build cache
-podman system prune -a
-
-# Build with verbose output
-podman build --no-cache -t ansible-jinja2-playground -f Containerfile .
+export AJP_DEBUG=true
+python ansible-jinja2-playground/run.py
 ```
 
-#### 2. Container Runtime Issues
+## Container Volumes
+
+For persistent data with containers:
 
 ```bash
-# Check container status
-podman ps -a
-
-# Check container logs
-podman logs ansible-jinja2-playground
-
-# Inspect container configuration
-podman inspect ansible-jinja2-playground
+podman run -p 8000:8000 \
+  -v $(pwd)/ansible-jinja2-playground/conf:$(pwd)/ansible-jinja2-playground/ansible-jinja2-playground/conf \
+  ansible-jinja2-playground
 ```
 
-#### 3. Volume Mount Problems
+## Security Notes
+
+### Production Deployment
+
+- Use reverse proxy (nginx/Apache)
+- Enable HTTPS/TLS
+- Implement access controls
+- Regular security updates
+
+### Built-in Security
+
+- Jinja2 SandboxedEnvironment prevents code injection
+- Input validation and sanitization
+- Restricted file system access
+
+## Performance
+
+### Optimization Tips
+
+- Monitor memory with large templates
+- Adjust history retention in config
+- Use simple templates for large datasets
+- Regular cleanup of history files
+
+### Resource Monitoring
 
 ```bash
-# Check volume permissions
-ls -la conf/ inputs/
+# Check application health
+curl http://localhost:8000/
 
-# Fix ownership if needed
-sudo chown -R 1000:1000 conf/
-
-# Verify volume mounts
-podman inspect ansible-jinja2-playground | grep -A 10 "Mounts"
+# Monitor resources
+htop
+df -h
 ```
 
-#### 4. Port Binding Issues
+## Updates
 
 ```bash
-# Check port availability
-ss -tlnp | grep 8000
+# Update application
+git pull origin main
+pip install --upgrade -r ansible-jinja2-playground/requirements.txt
 
-# Use different port
-podman run -p 8080:8000 ansible-jinja2-playground
-
-# Check container networking
-podman exec ansible-jinja2-playground netstat -tlnp
-```
-
-#### 5. Container Health Issues
-
-```bash
-# Check health status
-podman inspect --format='{{.State.Health.Status}}' ansible-jinja2-playground
-
-# Manual health check
-curl -f http://localhost:8000/
-
-# Debug container environment
-podman exec -it ansible-jinja2-playground /bin/bash
-```
-
-## Performance Optimization
-
-### 1. Virtual Environment Location
-
-- Place virtual environment on fast storage (SSD)
-- Avoid network drives for virtual environments
-
-### 2. Python Optimization
-
-```bash
-# Use optimized Python compilation
-export PYTHONOPTIMIZE=2
-
-# Increase Python memory limits if needed
-export PYTHONMALLOC=malloc
-```
-
-### 3. System Resources
-
-- Ensure adequate RAM (minimum 512MB)
-- Monitor disk space in `conf/` directory
-- Regular cleanup of history files if needed
-
-## Security Considerations
-
-### 1. Virtual Environment Isolation
-
-- Always use virtual environments in production
-- Regularly update dependencies
-- Monitor for security vulnerabilities
-
-### 2. File System Permissions
-
-```bash
-# Secure configuration directory
-chmod 750 conf/
-chmod 640 conf/*.conf
-
-# Secure input directory
-chmod 755 inputs/
-chmod 644 inputs/*
-```
-
-### 3. Network Security
-
-- Use firewall rules to restrict access
-- Consider reverse proxy for production
-- Enable HTTPS for public deployments
-
-## Uninstallation
-
-### Remove Virtual Environment
-
-```bash
-# Deactivate environment
-deactivate
-
-# Remove virtual environment directory
-rm -rf /path/to/venvs/python3.9-ansible2.14
-```
-
-### Remove Application Files
-
-```bash
-# Remove application directory
-rm -rf ansible_jinja2_playground
-
-# Remove any system-wide packages (if installed globally)
-pip uninstall ansible jinja2 pyyaml markupsafe
+# Backup configuration
+tar -czf backup-$(date +%Y%m%d).tar.gz ansible-jinja2-playground/conf/
 ```
 
 ## Next Steps
 
-After successful installation:
+1. **Read Documentation**: Review `USAGE.md` and `LOOP_USAGE.md`
+2. **Try Examples**: Test with sample templates
+3. **Configure Preferences**: Customize theme and editor settings
+4. **Explore API**: Test programmatic access
+5. **Integrate Workflow**: Use with Ansible development
 
-1. **Read Usage Guide**: See `USAGE.md` for detailed usage instructions
-2. **Explore Examples**: Check `inputs/` directory for sample files
-3. **Review Configuration**: Understand settings in `conf/` directory
-4. **Test Loop Functionality**: See `LOOP_USAGE.md` for advanced features
+## Support
 
-For additional support, consult the project documentation or community forums.
+- **Documentation**: `USAGE.md`, `LOOP_USAGE.md`
+- **Issues**: GitHub repository issues
+- **Tests**: Run `python tests/run_all_tests.py`
+- **Compliance**: Run `python check_compliance.py`
+
+The playground is now ready for developing and testing Ansible-compatible Jinja2 templates.

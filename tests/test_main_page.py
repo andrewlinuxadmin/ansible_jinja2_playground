@@ -33,8 +33,8 @@ class TestMainPageEndpoint(HTTPTestCase):
     # Check for form or interactive elements (common in web playgrounds)
     # This might need adjustment based on actual HTML content
     self.assertTrue(
-      any(element in content for element in ['<form', '<textarea', '<input', '<button']),
-      "Main page should contain interactive elements"
+        any(element in content for element in ['<form', '<textarea', '<input', '<button']),
+        "Main page should contain interactive elements"
     )
 
   def test_get_main_page_encoding(self):

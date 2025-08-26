@@ -1,0 +1,191 @@
+---
+# Advanced Server Audit Playbook - AFTER developing template in Ansible Jinja2 Playground
+# Este é um exemplo de como o playbook ficaria após usar o playground para desenvolver
+# o template Jinja2 perfeito para o relatório.
+
+- name: Advanced Server Audit with Developed Template
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    playground_url: "http://127.0.0.1:8000"
+    report_format: "html"  # html, markdown, json, text
+
+  tasks:
+    # [Tasks 1-6 are the same as demo_server_audit.yml - data collection]
+    # ... (omitted for brevity)
+
+    - name: "Consolidate audit data (same as before)"
+      ansible.builtin.set_fact:
+        server_audit_data:
+          hostname: "{{ ansible_hostname }}"
+          fqdn: "{{ ansible_fqdn }}"
+          os_family: "{{ ansible_os_family }}"
+          distribution: "{{ ansible_distribution }}"
+          distribution_version: "{{ ansible_distribution_version }}"
+          # ... (rest of data structure)
+
+    - name: "🎯 Generate Professional HTML Audit Report"
+      ansible.builtin.template:
+        src: server_audit_report.html.j2
+        dest: "/tmp/server_audit_{{ ansible_hostname }}_{{ ansible_date_time.epoch }}.html"
+      vars:
+        # This template was developed and tested in the Ansible Jinja2 Playground!
+        audit_data: "{{ server_audit_data }}"
+      when: report_format == "html"
+
+    - name: "📋 Generate Markdown Report"
+      ansible.builtin.template:
+        src: server_audit_report.md.j2
+        dest: "/tmp/server_audit_{{ ansible_hostname }}_{{ ansible_date_time.epoch }}.md"
+      vars:
+        audit_data: "{{ server_audit_data }}"
+      when: report_format == "markdown"
+
+    - name: "📊 Example: Complex Jinja2 template developed in playground"
+      ansible.builtin.copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Server Audit Report - {{ server_audit_data.hostname }}</title>
+              <style>
+                  body { font-family: Arial, sans-serif; margin: 20px; }
+                  .header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+                  .section { margin: 20px 0; padding: 15px; border-left: 4px solid #3498db; }
+                  .critical { border-left-color: #e74c3c; }
+                  .success { border-left-color: #27ae60; }
+                  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                  th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                  th { background-color: #f2f2f2; }
+                  .metric { display: inline-block; margin: 10px; padding: 15px; background: #ecf0f1; border-radius: 5px; }
+              </style>
+          </head>
+          <body>
+              <div class="header">
+                  <h1>🖥️ Server Audit Report</h1>
+                  <h2>{{ server_audit_data.hostname }} ({{ server_audit_data.fqdn }})</h2>
+                  <p>Generated on: {{ server_audit_data.timestamp }}</p>
+              </div>
+
+              <div class="section">
+                  <h3>📊 Quick Metrics</h3>
+                  <div class="metric">
+                      <strong>Uptime</strong><br>
+                      {{ (server_audit_data.uptime | int / 3600) | round(1) }} hours
+                  </div>
+                  <div class="metric">
+                      <strong>Services</strong><br>
+                      {{ server_audit_data.services.running_services }}/{{ server_audit_data.services.total_count }} running
+                  </div>
+                  <div class="metric">
+                      <strong>Open Ports</strong><br>
+                      {{ server_audit_data.network.open_ports | length }} ports
+                  </div>
+                  <div class="metric">
+                      <strong>Memory</strong><br>
+                      {{ server_audit_data.memtotal_mb }}MB total
+                  </div>
+              </div>
+
+              <div class="section">
+                  <h3>🔧 System Information</h3>
+                  <table>
+                      <tr><th>Property</th><th>Value</th></tr>
+                      <tr><td>Operating System</td><td>{{ server_audit_data.distribution }} {{ server_audit_data.distribution_version }}</td></tr>
+                      <tr><td>Kernel</td><td>{{ server_audit_data.kernel }}</td></tr>
+                      <tr><td>Architecture</td><td>{{ server_audit_data.architecture }}</td></tr>
+                      <tr><td>CPU Cores</td><td>{{ server_audit_data.processor_cores }}</td></tr>
+                      <tr><td>Primary IP</td><td>{{ server_audit_data.network.default_ipv4 }}</td></tr>
+                  </table>
+              </div>
+
+              <div class="section {% if server_audit_data.services.critical_services | length < 3 %}critical{% else %}success{% endif %}">
+                  <h3>🚀 Critical Services Status</h3>
+                  {% if server_audit_data.services.critical_services | length > 0 %}
+                  <ul>
+                  {% for service in server_audit_data.services.critical_services %}
+                      <li>✅ {{ service }}</li>
+                  {% endfor %}
+                  </ul>
+                  {% else %}
+                  <p>⚠️ No critical services detected running</p>
+                  {% endif %}
+              </div>
+
+              <div class="section">
+                  <h3>🌐 Network Security Overview</h3>
+                  {% set port_count = server_audit_data.network.open_ports | length %}
+                  {% if port_count > 20 %}
+                  <div class="critical">
+                      <h4>⚠️ Security Concern</h4>
+                      <p>High number of open ports detected ({{ port_count }}). Review for unnecessary services.</p>
+                  </div>
+                  {% elif port_count > 10 %}
+                  <div style="border-left-color: #f39c12;">
+                      <h4>⚡ Moderate Risk</h4>
+                      <p>{{ port_count }} open ports. Consider if all are necessary.</p>
+                  </div>
+                  {% else %}
+                  <div class="success">
+                      <h4>✅ Good Security Posture</h4>
+                      <p>Reasonable number of open ports ({{ port_count }}).</p>
+                  </div>
+                  {% endif %}
+
+                  <h4>Open Ports List:</h4>
+                  <div style="columns: 4; column-gap: 20px;">
+                  {% for port in server_audit_data.network.open_ports %}
+                      <div>🔌 Port {{ port }}</div>
+                  {% endfor %}
+                  </div>
+              </div>
+
+              <div class="section">
+                  <h3>💾 Storage Information</h3>
+                  <table>
+                      <tr><th>Mount Point</th><th>Usage</th></tr>
+                  {% for disk_line in server_audit_data.storage.disk_usage %}
+                      {% set disk_parts = disk_line.split() %}
+                      {% if disk_parts | length >= 6 %}
+                      <tr>
+                          <td>{{ disk_parts[5] }}</td>
+                          <td>{{ disk_parts[4] }} used ({{ disk_parts[2] }} available)</td>
+                      </tr>
+                      {% endif %}
+                  {% endfor %}
+                  </table>
+              </div>
+
+              <div class="section">
+                  <h3>⚙️ Top Processes by CPU</h3>
+                  <pre style="background: #f8f9fa; padding: 10px; overflow-x: auto;">
+          {% for process in server_audit_data.processes.top_cpu_processes %}
+          {{ process }}
+          {% endfor %}
+                  </pre>
+              </div>
+
+              <footer style="margin-top: 40px; text-align: center; color: #7f8c8d;">
+                  <p>Report generated by Ansible with templates developed in Ansible Jinja2 Playground</p>
+                  <p>🚀 Template development made easy with real-time testing!</p>
+              </footer>
+          </body>
+          </html>
+        dest: "/tmp/sample_audit_report.html"
+
+    - name: "✅ Report Generation Complete"
+      ansible.builtin.debug:
+        msg: |
+          🎉 Professional audit report generated successfully!
+
+          📄 Report saved to: /tmp/sample_audit_report.html
+
+          🔥 Key Benefits of using Ansible Jinja2 Playground:
+          ✅ Real-time template testing without running full playbooks
+          ✅ Instant feedback on Jinja2 syntax and logic
+          ✅ Safe environment to experiment with complex templates
+          ✅ Easy data visualization before implementation
+          ✅ Rapid prototype-to-production workflow
+
+          💡 This complex HTML template was developed and tested iteratively
+          in the playground, ensuring it works perfectly before deployment!
