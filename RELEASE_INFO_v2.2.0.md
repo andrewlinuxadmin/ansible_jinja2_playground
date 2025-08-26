@@ -2,8 +2,8 @@
 
 ## 📦 Release Package
 
-**File**: `ansible-jinja2-playground-v2.2.0.tar.gz`  
-**Size**: 29,687 bytes  
+**File**: `ansible-jinja2-playground-v2.2.0.tar.gz`
+**Size**: 29,687 bytes
 **SHA256**: `4518d44d1dfcd4530ebd1cd995f097f6915b3e21b1932114b9466c71a3728ed6`
 
 ## 📋 Package Contents
