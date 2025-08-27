@@ -1,20 +1,23 @@
 ---
 - name: Enviar todas as variáveis do Ansible para o Jinja2 Playground
   hosts: localhost
-  gather_facts: true
-  vars:
-    app_name: "MyApp"
-    app_version: "2.2.0"
-    env_type: "production"
-
+  gather_facts: false
+  become: true
   tasks:
-    - name: Collect services using service_facts
-      ansible.builtin.service_facts: {}
-      register: services_collection_result
+    - name: Gather service facts
+      ansible.builtin.service_facts:
 
-    - name: Collect active TCP/UDP ports using community.general
-      community.general.listen_ports_facts: {}
-      register: ports_collection_result
+    - name: Debug services
+      ansible.builtin.debug:
+        var: services
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Debug packages
+      ansible.builtin.debug:
+        var: packages
 
     - name: Send Ansible variables to Jinja2 Playground
       ansible.builtin.uri:
@@ -22,12 +25,11 @@
         method: POST
         body_format: json
         body:
-          variables_b64: "{{ vars | to_json | b64encode }}"
+          variables_b64: "{{ vars.ansible_facts | to_json | b64encode }}"
           summary:
-            total_variables: "{{ vars | length }}"
+            total_variables: "{{ vars.ansible_facts | length }}"
             my_test: "test_value"
             source: "all_variables"
-            timestamp: "{{ ansible_date_time.iso8601 }}"
         headers:
           Content-Type: "application/json"
         timeout: 10

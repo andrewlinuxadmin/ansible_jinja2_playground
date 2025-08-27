@@ -1,0 +1,51 @@
+---
+- name: Enviar todas as variáveis do Ansible para o Jinja2 Playground
+  hosts: localhost
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Debug services
+      ansible.builtin.debug:
+        var: services
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Debug packages
+      ansible.builtin.debug:
+        var: packages
+
+    - name: Build partial maps (one per service)
+      ansible.builtin.set_fact:
+        services_packages: "{{ (services_packages | default([])) + [item_processed | from_yaml] }}"
+      vars:
+        item_processed: >-
+          {% set ns = namespace(output={}) %}
+          {% set service_name = item | regex_replace('\.service$', '') %}
+          {% set service_atate = (services[item].state | default('unknown')) %}
+          {% if service_name in packages and (packages[service_name] | length) > 0 %}
+            {% set pkg0 = (packages[service_name] | first) %}
+            {% set ns.output = ns.output | combine({
+              'service_unit': item,
+              'service_state': service_atate,
+              'package_version': pkg0.version | default(''),
+              'package_release': pkg0.release | default('')
+            }) %}
+          {% else %}
+            {% set ns.output = ns.output | combine({
+              'service_unit': item,
+              'service_state': service_atate,
+              'package_version': 'unknown',
+              'package_release': 'unknown'
+            }) %}
+          {% endif %}
+          {{ ns.output }}
+      loop: "{{ services.keys() | list }}"
+
+    - name: Debug services_packages
+      ansible.builtin.debug:
+        var: services_packages

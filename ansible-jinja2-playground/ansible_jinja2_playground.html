@@ -455,11 +455,14 @@
         inputEditor.setValue(entry.input);
         updateInputFormat(entry.input);
 
-        // Set the jinja expression
-        jinjaEditor.setValue(entry.expr);
+        // Only update Jinja2 expression if it's not empty (preserve current content when empty)
+        if (entry.expr && entry.expr.trim() !== '') {
+          jinjaEditor.setValue(entry.expr);
+        }
 
-        // Set loop settings
-        if (entry.enable_loop !== undefined) {
+        // Don't update loop settings for listener entries to preserve current user settings
+        // Only set loop settings if they are explicitly defined and entry is not from listener
+        if (entry.source !== 'listener' && entry.enable_loop !== undefined) {
           const enableLoop = entry.enable_loop === true;
           document.getElementById('enable-loop').checked = enableLoop;
           toggleLoopControls(false);
@@ -802,7 +805,11 @@
         // Use values directly (already decoded by Python backend)
         inputEditor.setValue(historyEntry.input);
         updateInputFormat(historyEntry.input);
-        jinjaEditor.setValue(historyEntry.expr);
+
+        // Only update Jinja2 expression if it's not empty (preserve current content when empty)
+        if (historyEntry.expr && historyEntry.expr.trim() !== '') {
+          jinjaEditor.setValue(historyEntry.expr);
+        }
 
         // Restore loop settings if they exist
         if (historyEntry.enable_loop !== undefined) {

@@ -228,12 +228,14 @@ class JinjaHandler(BaseHTTPRequestHandler):
           e['expr'] = base64.b64decode(e.get('expr', '')).decode('utf-8')
         except Exception:
           pass
-        # Handle enable_loop as boolean (no base64 needed)
-        e['enable_loop'] = e.get('enable_loop', False)
-        if isinstance(e['enable_loop'], str):
-          e['enable_loop'] = e['enable_loop'].lower() == 'true'
-        # Keep loop_variable as plain text (no base64 encoding)
-        e['loop_variable'] = e.get('loop_variable', '')
+        # Handle enable_loop as boolean (no base64 needed) - only if it exists
+        if 'enable_loop' in e:
+          e['enable_loop'] = e.get('enable_loop', False)
+          if isinstance(e['enable_loop'], str):
+            e['enable_loop'] = e['enable_loop'].lower() == 'true'
+        # Keep loop_variable as plain text (no base64 encoding) - only if it exists
+        if 'loop_variable' in e:
+          e['loop_variable'] = e.get('loop_variable', '')
         decoded.append(e)
       self.wfile.write(json.dumps(decoded, indent=2).encode('utf-8'))
       return
@@ -685,13 +687,13 @@ class JinjaHandler(BaseHTTPRequestHandler):
         raise ValueError(f"Invalid base64 variables data: {e}")
 
       # Create history entry
+      # Don't set default values for listener entries to preserve existing content
       entry = {
           'id': str(uuid.uuid4()),
           'datetime': datetime.datetime.now().isoformat() + 'Z',
           'input': variables_b64,
-          'expr': base64.b64encode('{{ data }}'.encode()).decode(),
-          'enable_loop': False,
-          'loop_variable': '',
+          'expr': base64.b64encode(''.encode()).decode(),  # Empty expr to preserve current content
+          # Don't set enable_loop and loop_variable to preserve current loop settings
           'source': 'listener',
           'summary': summary
       }

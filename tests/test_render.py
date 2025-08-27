@@ -303,7 +303,7 @@ class TestRenderEndpoint(HTTPTestCase):
     result = json.loads(response['content'])
     self.assertIsInstance(result, list)
     self.assertEqual(len(result), 3)
-    
+
     # Should contain all service keys
     service_names = [item.replace('Service: ', '') for item in result]
     self.assertIn('web', service_names)
@@ -325,7 +325,7 @@ class TestRenderEndpoint(HTTPTestCase):
     result = json.loads(response['content'])
     self.assertIsInstance(result, list)
     self.assertEqual(len(result), 3)
-    
+
     # Should contain all service values
     technologies = [item.replace('Technology: ', '') for item in result]
     self.assertIn('nginx', technologies)
@@ -347,7 +347,7 @@ class TestRenderEndpoint(HTTPTestCase):
     result = json.loads(response['content'])
     self.assertIsInstance(result, list)
     self.assertEqual(len(result), 5)
-    
+
     # Should contain numbers 0 through 4
     for i in range(5):
       self.assertEqual(result[i], f'Number: {i}')
@@ -367,7 +367,7 @@ class TestRenderEndpoint(HTTPTestCase):
     result = json.loads(response['content'])
     self.assertIsInstance(result, list)
     self.assertEqual(len(result), 3)
-    
+
     # Should contain all service keys
     service_names = [item.replace('Service via data: ', '') for item in result]
     self.assertIn('web', service_names)
@@ -389,7 +389,7 @@ class TestRenderEndpoint(HTTPTestCase):
     result = json.loads(response['content'])
     self.assertIsInstance(result, list)
     self.assertEqual(len(result), 2)  # Only active users
-    
+
     # Should contain only active users
     active_users = [item.replace('Active user: ', '') for item in result]
     self.assertIn('Alice', active_users)

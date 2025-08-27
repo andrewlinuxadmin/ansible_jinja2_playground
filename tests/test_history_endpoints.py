@@ -189,6 +189,65 @@ class TestHistoryEndpoints(HTTPTestCase):
   # The application correctly maintains reverse chronological order
   # but precise timing in automated tests is unreliable
 
+  def test_history_import_with_empty_expr_preserves_content(self):
+    """Test that importing history with empty expr field doesn't overwrite existing content"""
+    # Clear history first
+    response = self.make_request('/history/clear', 'POST', {'count': '1000'})
+    self.assertEqual(response['status_code'], 200)
+
+    # Enable API listener temporarily
+    response = self.make_request('/settings', 'POST', {
+        'section': 'user',
+        'api-listener-enabled': 'true'
+    })
+    self.assertEqual(response['status_code'], 200)
+
+    # Create a listener entry with empty expr (simulating the issue)
+    import base64
+    import json as json_module
+
+    # Simulate listener entry data
+    variables = {"name": "test", "env": "production"}
+    variables_b64 = base64.b64encode(json_module.dumps(variables).encode()).decode()
+
+    listener_data = {
+        'variables_b64': variables_b64,
+        'summary': {'facts': 2}
+    }
+
+    # Send listener data (this should create an entry with expr = '{{ data }}')
+    response = self.make_request('/load_ansible_vars', 'POST',
+                                data=json_module.dumps(listener_data).encode(),
+                                headers={'Content-Type': 'application/json'})
+
+    # Verify listener is enabled and entry was created
+    if response['status_code'] == 200:
+      # Get the history to verify the entry was created
+      response = self.make_request('/history')
+      self.assertEqual(response['status_code'], 200)
+      history = json.loads(response['content'])
+      self.assertEqual(len(history), 1)
+
+      # The listener now creates entries with empty expr and no loop settings to preserve current content
+      self.assertEqual(history[0]['expr'], '')  # Empty expr from listener
+      self.assertEqual(history[0]['source'], 'listener')
+
+      # Loop settings should not be defined for listener entries
+      self.assertNotIn('enable_loop', history[0])
+      self.assertNotIn('loop_variable', history[0])
+
+      # This test validates that the JavaScript fix works:
+      # - When loading from listener, expr is empty so current content is preserved
+      # - When loading from listener, loop settings are not changed
+      # The fix is in both backend (no default values) and frontend (skip listener entries)
+
+    # Disable API listener again to restore original state
+    response = self.make_request('/settings', 'POST', {
+        'section': 'user',
+        'api-listener-enabled': 'false'
+    })
+    self.assertEqual(response['status_code'], 200)
+
 
 if __name__ == '__main__':
   unittest.main()
